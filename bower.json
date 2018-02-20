@@ -3,6 +3,13 @@
   "private": true,
   "dependencies": {
     "purescript-console": "^3.0.0",
-    "purescript-eff": "^3.1.0"
+    "purescript-eff": "^3.1.0",
+    "purescript-canvas": "^3.3.0",
+    "purescript-drawing": "^3.0.0",
+    "purescript-numbers": "^5.0.0",
+    "purescript-transformers": "^3.5.0",
+    "purescript-psci-support": "^3.0.0",
+    "purescript-monoid": "^3.3.0",
+    "purescript-tuples": "^4.1.0"
   }
 }

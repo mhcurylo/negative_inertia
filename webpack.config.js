@@ -13,7 +13,7 @@ module.exports = {
     stats: 'errors-only'
   },
 
-  entry: './src/Example.purs',
+  entry: './src/Main.purs',
 
   output: {
     path: __dirname,
