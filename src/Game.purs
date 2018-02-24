@@ -1,10 +1,12 @@
 module Game (gameLoop, initialGameState) where
 
-import Prelude ((+), (-), (*), (/), ($), (<), (>), (<<<), (<*>), (<$>), (||), (&&), negate)
+import Prelude ((+), (-), (*), (/), ($), (<), (>), (<<<), (<*>), (<$>), (==), (||), (&&), negate, not)
 import Types 
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.Tuple (Tuple(Tuple))
 import Control.Biapply ((<<*>>))
+import Control.Alt ((<|>))
+-- import Debug.Trace
 
 createPhysical inertia w h x y = ({
     pos : {x, y}
@@ -23,21 +25,44 @@ createWall = createPhysical 0.0 960.0 5.0 20.0
 center :: Physical -> Vector
 center ({pos, size}) = ({x: (pos.x + size.x) / 2.0, y: (pos.y + size.y) / 2.0})
 
-ballLine :: Ball -> {a1 :: Vector, a2 :: Vector}
+type Line = {v1 :: Vector, v2 :: Vector}
+
+
+ballLine :: Ball -> Line 
 ballLine b@({vel}) = ({
-  a1: c,
-  a2: {x: c.x - vel.x, y: c.x - vel.y}
+  v1: c,
+  v2: {x: c.x - vel.x, y: c.x - vel.y}
 })
   where
   c = center b
 
+paddleLeftLine :: Paddle -> Line
+paddleLeftLine ({size, pos: p@{x, y}, vel}) 
+  | vel.y > 0.0 = ({
+       v1: {x: x + size.x, y}
+     , v2: {x: x + vel.x, y}
+  })
+  | true = ({
+       v1: p
+     , v2: {x: x + size.x + vel.x, y}
+  })
+
+paddleRightLine :: Paddle -> Line
+paddleRightLine p@({size}) = ({
+      v1: rightY v1 
+    , v2: rightY v2
+})
+  where
+  rightY ({x, y}) = ({x, y: y + size.y}) 
+  ({v1, v2}) = paddleLeftLine p
+
 accBall :: Ball -> Ball
-accBall b = b {vel = {x: 0.5, y: 0.5}}
+accBall b = b {vel = {x: 2.0, y: 0.0}}
 
 initialGameState :: GameState
 initialGameState = ({
     ball: accBall (createBall 495.0 300.0)
-  , paddles: Tuple (createPaddle 40.0 50.0) (createPaddle 960.0 520.0)
+  , paddles: Tuple (createPaddle 30.0 280.0) (createPaddle 960.0 280.0)
   , scores: Tuple 0 0
   , walls: Tuple (createWall 35.0) (createWall 590.0)
 })
@@ -59,17 +84,17 @@ accelerate p@{pos, vel, acc, inertia} = p {
 playerMoves :: PlayerMoves -> GameState -> GameState
 playerMoves pms gs@({paddles}) = gs { paddles = (both movePlayer pms <<*>> paddles) }
 
-
 move :: GameState -> GameState
 move gs@{ball, paddles} = gs {ball = accelerate ball, paddles = both accelerate paddles}
 
-
 data Eq = Eq Number Number Number
 
+filterMaybe :: forall a . (a -> Boolean)  -> Maybe a -> Maybe a
+filterMaybe f j@(Just a) = if f a then j else Nothing
+filterMaybe f Nothing = Nothing  
+
 nonZero :: Number -> Maybe Number
-nonZero n = if n > 0.0
-  then Just 0.0
-  else Nothing
+nonZero = filterMaybe (\v -> v > 0.0) <<< Just
 
 denom :: Vector -> Vector -> Vector -> Vector -> Maybe Number
 denom a1 a2 b1 b2 = nonZero (((a1.x - a2.x) * (b1.y - b2.y)) - ((a1.y - a2.y) * (b1.x - b2.x)))
@@ -80,9 +105,13 @@ fub a1 a2 b1 b2 d = (((a2.x - a1.x) * (a1.y - b1.y)) - ((a2.y - a1.y) * (a1.x - 
 intersected :: Number -> Number -> Boolean
 intersected ua ub = (ua < 0.0) || (ua > 1.0) || (ub < 0.0) || (ub > 1.0) 
 
-intersectLines :: Vector -> Vector -> Vector -> Vector -> Boolean
-intersectLines a1 a2 b1 b2 = fromMaybe false $ intersected <$> (fua a1 a2 b1 b2 <$> d) <*> (fub a1 a2 b1 b2 <$> d)
+intersectLines :: Line -> Line -> Maybe Boolean
+intersectLines a b = filterMaybe (\m -> m == false) $ not <$> intersected <$> (fua a1 a2 b1 b2 <$> d) <*> (fub a1 a2 b1 b2 <$> d)
   where
+  a1 = a.v1
+  a2 = a.v2
+  b1 = b.v1
+  b2 = b.v2
   d = denom a1 a2 b1 b2
 
 collideWithWalls :: GameState -> GameState
@@ -107,12 +136,12 @@ collideWithWalls gs@{ball, paddles, walls: Tuple w1 w2} = gs {
 
 pongTheBall :: GameState -> GameState
 pongTheBall gs@{ball, paddles: Tuple p1 p2} = gs {
-  ball = ball 
+  ball = fromMaybe ball (pongP1 <|> pongP2)
 }
   where 
-  ({a1, a2}) = ballLine ball      
-  pongP1 = Nothing
-  pongP2 = Nothing   
+  l = ballLine ball      
+  pongP1 = (\_ -> ball { vel = {x: ball.vel.x * -1.0, y: ball.vel.y}, pos = ball.pos } ) <$> intersectLines l (paddleRightLine p1)
+  pongP2 = (\_ -> ball { vel = {x: ball.vel.x * -1.0, y: ball.vel.y}, pos = ball.pos } ) <$> intersectLines l (paddleLeftLine p2) 
 
 score x = x     
 

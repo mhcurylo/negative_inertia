@@ -9,7 +9,7 @@
   },
   "files": [],
   "scripts": {
-    "webpack": "DEBUG=purs-loader* DEBUG_DEPTH=100 webpack --progress --bail",
+    "webpack": "DEBUG=purs-loader* DEBUG_DEPTH=100 webpack --progress --bail --hot",
     "webpack:watch": "PATH=$PATH:../releases/psc-package DEBUG=purs-loader* DEBUG_DEPTH=100 webpack --progress --display-error-details --display verbose --watch",
     "webpack:server": "webpack-dev-server --progress --inline",
     "webpack:server:debug": "DEBUG=purs-loader* DEBUG_DEPTH=100 webpack-dev-server --progress --inline --hot",
