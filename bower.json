@@ -10,6 +10,9 @@
     "purescript-transformers": "^3.5.0",
     "purescript-psci-support": "^3.0.0",
     "purescript-monoid": "^3.3.0",
-    "purescript-tuples": "^4.1.0"
+    "purescript-tuples": "^4.1.0",
+    "purescript-maps": "^3.6.0",
+    "purescript-behaviors": "^6.3.0",
+    "purescript-sets": "^3.1.0"
   }
 }

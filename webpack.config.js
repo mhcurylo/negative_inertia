@@ -33,10 +33,10 @@ module.exports = {
                 'bower_components/purescript-*/src/**/*.purs',
                 'src/**/*.purs'
               ],
-              bundle: false,
+              bundle: true,
               psc: 'psa',
               watch: true,
-              pscIde: false
+              pscIde: true
             }
           }
         ]
