@@ -1,6 +1,14 @@
-README
+# Negative Inertia
 
-This is a starter for purescript with a simple HELLO WORD for browser.
+Negative Inertia is a Pong Clone game written in purescript.
 
-It is a trimmed https://github.com/ethul/purescript-webpack-example
+do
+npm install
+bower install
+npm start
+
+then
+
+A and Z to move P1 
+UP and DOWN to move P2
 
