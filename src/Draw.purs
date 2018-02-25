@@ -10,13 +10,13 @@ import Graphics.Drawing (scale, translate, shadowBlur, black, shadowColor, rgb,
 import Data.Tuple (Tuple(Tuple))
 import Data.Foldable (foldMap)
 
-import Types (GameState, Physical, Scores)
+import Types 
 
 scoreFont :: Font
 scoreFont = font sansSerif 18 bold 
 
 drawSquare :: Physical -> Drawing
-drawSquare ({pos, size}) = filled (fillColor white) (rectangle pos.x pos.y size.x size.y) 
+drawSquare ({pos, size}) = filled (fillColor white) (rectangle (getX pos) (getY pos) (getX size) (getY size)) 
 
 drawScores :: Scores -> Drawing
 drawScores (Tuple p1 p2) = text scoreFont 490.0 25.0 (fillColor white) (show p1 <> " : " <> show p2) 
