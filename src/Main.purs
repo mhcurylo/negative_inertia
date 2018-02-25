@@ -30,4 +30,4 @@ game = do
 
 main = unsafePerformEff $ do
     game
---  hot
+    hot
