@@ -1,13 +1,16 @@
 module Game (gameLoop, initialGameState) where
 
-import Prelude ((+), (-), (*), (<<<), negate)
+import Prelude
 import Types 
-import Data.Tuple (Tuple(Tuple))
+import Data.Tuple (Tuple(Tuple), fst, snd)
+import Data.Maybe (Maybe(..), isJust)
+import Trace
+import AABB
 import Control.Biapply ((<<*>>))
 -- import Debug.Trace
 
 accBall :: Ball -> Ball
-accBall b = b {vel = vec 2.0 0.0}
+accBall b = b {vel = vec 0.0 2.0}
 
 initialGameState :: GameState
 initialGameState = ({
@@ -43,13 +46,25 @@ move :: GameState -> GameState
 move gs@{ball, paddles} = gs {ball = accelerate ball, paddles = both accelerate paddles}
 
 collideWithWalls :: GameState -> GameState
-collideWithWalls x = x
+collideWithWalls x = x {
+    ball = x.ball {
+      pos = case intersection of
+              Just b -> x.ball.pos
+              Nothing -> x.ball.pos
+      ,
+      vel = if isJust intersection then vec 0.0 0.0 else x.ball.vel
+    }
+  }
+  where
+    ball = fromPhysical $ x.ball
+    wall = fromPhysical $ snd x.walls
+    intersection = intersectAABBtoAABB ball wall
 
 pongTheBall :: GameState -> GameState
-pongTheBall  x = x
+pongTheBall x = x
 
 score :: GameState -> GameState
-score x = x     
+score x = x
 
 gameLoop :: PlayerMoves -> GameState -> GameState
 gameLoop pm = score <<< pongTheBall <<< collideWithWalls <<< move <<< playerMoves pm

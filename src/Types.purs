@@ -107,4 +107,3 @@ createBall = createPhysical (-0.001) 5.0 5.0
 
 createWall :: Number -> Wall
 createWall = createBox 960.0 5.0 20.0
-
