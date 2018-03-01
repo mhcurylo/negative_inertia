@@ -9,7 +9,7 @@ import Data.Array (zip)
 import Control.Biapply ((<<*>>))
 import Control.Alt ((<|>))
 import Data.Generic (class Generic, gShow)
--- import Debug.Trace
+import Debug.Trace
 
 data MinkowskiDifference = MinkowskiDifference {
     mTop :: Vector
@@ -44,23 +44,21 @@ xcVec :: Vector
 xcVec = vec (-1.0) 1.0
 
 collision :: Physical -> Physical -> Direction -> Tuple Physical Physical
-collision a b T = Tuple a' b' 
-  where
-  a' = a {vel = a.vel * ycVec }      
---  a' = a {vel = a.vel * ycVec, pos = setY (getY b.pos + getY b.size + 0.1) a.pos}      
-  b' = b {vel = b.vel * ycVec }      
 collision a b B = Tuple a' b' 
   where
-  a' = a {vel = a.vel * ycVec }      
--- a' = a {vel = a.vel * ycVec, pos = setY (getY b.pos - getY a.size - 0.1) a.pos}      
+  a' = a {vel = a.vel * ycVec, pos = setY (getY b.pos + getY b.size + 0.1) a.pos}      
   b' = b {vel = b.vel * ycVec }      
-collision a b R = Tuple a' b' 
+collision a b T = Tuple a' b' 
   where
-  a' = a {vel = a.vel * xcVec + b.vel }      
-  b' = b {vel = b.vel * xcVec }      
+  a' = a {vel = a.vel * ycVec, pos = setY (getY b.pos - getY a.size - 0.1) a.pos}      
+  b' = b {vel = b.vel * ycVec }      
 collision a b L = Tuple a' b' 
   where
-  a' = a {vel = a.vel * xcVec + b.vel }      
+  a' = a {vel = a.vel * xcVec + b.vel, pos = setX (getX b.pos - getX a.size - 0.1) a.pos}      
+  b' = b {vel = b.vel * xcVec }      
+collision a b R = Tuple a' b' 
+  where
+  a' = a {vel = a.vel * xcVec + b.vel, pos = setX (getX b.pos + b.size + 0.1) a.pos}      
   b' = b {vel = b.vel * xcVec }      
 
 didCollide :: Physical -> Physical -> Maybe Direction
@@ -68,7 +66,7 @@ didCollide a b = if maxX >= 0.0
                    && maxY >= 0.0
                    && minY <= 0.0 
                    && minX <= 0.0 
-  then snd <$> (minimumBy (comparing fst) $ zip [maxY, maxX, (-minY), (-minX)] [T, R, B, L])
+  then spy <$> snd <$> (minimumBy (comparing fst) $ zip [maxY, maxX, (-minY), (-minX)] [T, R, B, L])
   else Nothing
   where
   (MinkowskiDifference {mTop, mBottom}) = minkowskiDifference a b      

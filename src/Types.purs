@@ -59,7 +59,6 @@ instance semiringVector :: Semiring Vector where
 instance ringVector :: Ring Vector where
   sub = subV
 
-
 type Physical = {
     pos  :: Vector 
   , vel  :: Vector
@@ -104,10 +103,10 @@ createBox :: Number -> Number -> Number -> Number -> Physical
 createBox = createPhysical 0.0
 
 createPaddle :: Number -> Number -> Paddle
-createPaddle = createPhysical 0.1 10.0 50.0
+createPaddle = createPhysical 0.1 20.0 70.0
 
 createBall :: Number -> Number -> Ball
-createBall = createPhysical (-0.001) 5.0 5.0 
+createBall = createPhysical (-0.001) 15.0 15.0 
 
 createWall :: Number -> Wall
-createWall = createBox 960.0 15.0 20.0
+createWall = createBox 960.0 5.0 20.0
