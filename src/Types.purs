@@ -3,6 +3,7 @@ module Types where
 import Prelude 
 import Data.Tuple (Tuple)
 import Data.Bifunctor (bimap) 
+import Data.Generic (class Generic, gShow)
 
 data Move = Up | Down | Stay
 
@@ -10,6 +11,8 @@ data Vector = Vector {
     x :: Number
   , y :: Number
 }
+
+derive instance genericVector :: Generic Vector
 
 addV :: Vector -> Vector -> Vector
 addV (Vector a) (Vector b) = vec (a.x + b.x) (a.y + b.y)
@@ -45,7 +48,7 @@ instance eqVector :: Eq Vector where
   eq (Vector v1) (Vector v2) = v1.x == v2.x && v1.y == v2.y
 
 instance showVector :: Show Vector where
-  show (Vector {x, y}) = "Vector x: " <> show x <> ", y: " <> show y <> "." 
+  show (Vector {x, y}) = "Vector x: " <> show x <> ", y: " <> show y <> ";" 
 
 instance semiringVector :: Semiring Vector where
   add = addV
@@ -56,7 +59,6 @@ instance semiringVector :: Semiring Vector where
 instance ringVector :: Ring Vector where
   sub = subV
 
-
 type Physical = {
     pos  :: Vector 
   , vel  :: Vector
@@ -64,6 +66,8 @@ type Physical = {
   , size :: Vector
   , inertia :: Vector
 }
+
+showPhysical ({pos, size, vel}) = "Physical pos: " <> show pos <> ", size: " <> show size <> ", vel: " <> show vel <> ";"
 
 type Double a = Tuple a a
 type Score = Int
@@ -86,7 +90,6 @@ type GameState = {
     , scores :: Scores
 }
 
-
 createPhysical :: Number -> Number -> Number -> Number -> Number -> Physical
 createPhysical i w h x y = ({
     pos: vec x y
@@ -100,10 +103,10 @@ createBox :: Number -> Number -> Number -> Number -> Physical
 createBox = createPhysical 0.0
 
 createPaddle :: Number -> Number -> Paddle
-createPaddle = createPhysical 0.1 10.0 50.0
+createPaddle = createPhysical 0.1 20.0 70.0
 
 createBall :: Number -> Number -> Ball
-createBall = createPhysical (-0.001) 5.0 5.0 
+createBall = createPhysical (-0.001) 15.0 15.0 
 
 createWall :: Number -> Wall
 createWall = createBox 960.0 5.0 20.0
