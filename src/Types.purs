@@ -38,6 +38,9 @@ setY n (Vector {x,y}) = Vector {x,y: n}
 setX :: Number -> Vector -> Vector
 setX n (Vector {x,y}) = Vector {x: n,y}  
 
+dot :: Vector -> Vector -> Number
+dot a b = getX a * getX b + getY a * getY B
+
 zeroVector :: Vector
 zeroVector = vec 0.0 0.0
 
