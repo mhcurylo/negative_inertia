@@ -39,7 +39,7 @@ setX :: Number -> Vector -> Vector
 setX n (Vector {x,y}) = Vector {x: n,y}  
 
 dot :: Vector -> Vector -> Number
-dot a b = getX a * getX b + getY a * getY B
+dot a b = getX a * getX b + getY a * getY b
 
 zeroVector :: Vector
 zeroVector = vec 0.0 0.0
