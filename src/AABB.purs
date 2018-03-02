@@ -20,6 +20,7 @@ fromPhysical x = {
   }
 
 -- | Separating Axis Theorem to find overlaping AABB of two AABB's
+intersectAABBtoAABB :: AABB -> AABB -> Maybe AABB
 intersectAABBtoAABB x y
   | x.top > y.bottom = Nothing
   | x.bottom < y.top = Nothing
