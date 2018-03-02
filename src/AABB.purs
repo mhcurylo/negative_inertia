@@ -19,7 +19,7 @@ fromPhysical x = {
     left: getX x.pos
   }
 
-intersectAABBtoAABB :: AABB -> AABB -> Maybe AABB
+-- | Separating Axis Theorem to find overlaping AABB of two AABB's
 intersectAABBtoAABB x y
   | x.top > y.bottom = Nothing
   | x.bottom < y.top = Nothing
