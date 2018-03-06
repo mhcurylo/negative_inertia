@@ -59,6 +59,10 @@ assert.deepEqual(
   {top: 5, left: 0, right: 1, bottom: 6}
 );
 
+function vec(x, y) {
+  return {x, y};
+}
+
 /**
  * https://www.gamedev.net/articles/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/
  */
@@ -74,28 +78,34 @@ function sweepAABB(v, a, b) {
   const entryTime = Math.max(xEntry, yEntry);
   const exitTime = Math.max(xExit, yExit);
   if (entryTime > exitTime || xEntry < 0 && yEntry < 0 || xEntry > 1 || yEntry > 1) {
-    // normal = 0 0
     return null;
   } else {
     if (xEntry > yEntry) {
       if (xInvEntry < 0) {
-        // normal = 1 0
+        return {time: entryTime, normal: vec(1, 0)};
       } else {
-        // normal = -1 0
+        return {time: entryTime, normal: vec(-1, 0)};
+      }
+    } else if (xEntry < yEntry) {
+      if (yInvEntry < 0) {
+        return {time: entryTime, normal: vec(0, 1)};
+      } else {
+        return {time: entryTime, normal: vec(0, -1)};
       }
     } else {
-      if (yInvEntry < 0) {
-        // normal = 0 1
-      } else {
-        // normal = 0 -1
-      }
+      return {
+        time: entryTime,
+        normal: vec(xInvEntry > 0 ? -1 : 1, xInvEntry > 0 ? -1 : 1)
+      };
     }
-    return {time: entryTime, normal: null};
   }
 }
 
-assert.deepEqual(null, sweepAABB({x: 0, y: 0}, fromRect(0, 0, 1, 1), fromRect(1, 0, 1, 1)));
-assert.deepEqual({time: 0.25, normal: null}, sweepAABB({x: 4, y: 0}, fromRect(0, 0, 1, 1), fromRect(2, 0, 1, 1)));
-assert.deepEqual({time: 0.25, normal: null}, sweepAABB({x: 0, y: 4}, fromRect(0, 0, 1, 1), fromRect(0, 2, 1, 1)));
-assert.deepEqual({time: 0.50, normal: null}, sweepAABB({x: 2, y: 2}, fromRect(0, 0, 1, 1), fromRect(2, 2, 1, 1)));
-assert.deepEqual({time: 0.50, normal: null}, sweepAABB({x: -2, y: -2}, fromRect(2, 2, 1, 1), fromRect(0, 0, 1, 1)));
+assert.deepEqual(null, sweepAABB(vec(0, 0), fromRect(0, 0, 1, 1), fromRect(1, 0, 1, 1)));
+assert.deepEqual({time: 0.25, normal: vec(-1, 0)}, sweepAABB(vec(4, 0), fromRect(0, 0, 1, 1), fromRect(2, 0, 1, 1)));
+assert.deepEqual({time: 0.25, normal: vec(0, -1)}, sweepAABB(vec(0, 4), fromRect(0, 0, 1, 1), fromRect(0, 2, 1, 1)));
+assert.deepEqual({time: 1.00, normal: vec(1, 0)}, sweepAABB(vec(-1, 0), fromRect(2, 2, 1, 1), fromRect(0, 0, 1, 1)));
+assert.deepEqual({time: 1.00, normal: vec(0, 1)}, sweepAABB(vec(0, -1), fromRect(2, 2, 1, 1), fromRect(0, 0, 1, 1)));
+// corner cases
+assert.deepEqual({time: 0.50, normal: vec(-1, -1)}, sweepAABB(vec(2, 2), fromRect(0, 0, 1, 1), fromRect(2, 2, 1, 1)));
+assert.deepEqual({time: 0.50, normal: vec(1, 1)}, sweepAABB(vec(-2, -2), fromRect(2, 2, 1, 1), fromRect(0, 0, 1, 1)));
