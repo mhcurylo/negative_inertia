@@ -1,7 +1,9 @@
 module AABB(AABB, fromPhysical, intersectAABBtoAABB) where
 
 import Prelude
-import Types (Physical, getX, getY)
+import Data.Number (infinity)
+import Math (max)
+import Types (Physical, Vector, getX, getY)
 import Data.Maybe (Maybe(..))
 
 type AABB = {
@@ -32,3 +34,25 @@ intersectAABBtoAABB x y
       bottom: if x.bottom >= y.top && x.bottom <= y.bottom then x.bottom else y.bottom,
       left: if x.left >= y.left && x.left <= y.right then x.left else y.left
     }
+
+-- | *** NOT TESTED ***
+-- | Find intersection time (0..1 inclusive) of moving AABB to static AABB
+-- | First argument is velocity of first AABB
+sweepAABB :: Vector -> AABB -> AABB -> Maybe Number
+sweepAABB v a b = Just 1.0
+  where
+    vx = getX v
+    vy = getY v
+    xInvEntry = if vx > 0.0 then b.left - a.right else b.right - a.left
+    xInvExit = if vx > 0.0 then b.right - a.left else b.left - a.right
+    yInvEntry = if vy > 0.0 then b.top - a.bottom else b.bottom - a.top
+    yInvExit = if vy > 0.0 then b.bottom - a.top else b.top - a.bottom
+    xEntry = if vx == 0.0 then -infinity else xInvEntry / vx
+    xExit = if vx == 0.0 then infinity else xInvExit / vx
+    yEntry = if vy == 0.0 then -infinity else yInvEntry / vy
+    yExit = if vy == 0.0 then infinity else yInvExit / vy
+    entryTime = max xEntry yEntry
+    exitTime = max xExit yExit
+    r = if entryTime > exitTime || xEntry < 0.0 && yEntry < 0.0 || xEntry > 1.0 || yEntry > 1.0
+        then Nothing
+        else Just entryTime
