@@ -58,6 +58,12 @@ sweepAABB v a b = r
     yExit = if vy == 0.0 then infinity else yInvExit / vy
     entryTime = max xEntry yEntry
     exitTime = max xExit yExit
+    nx = if xInvEntry < 0.0 then 1.0 else -1.0
+    ny = if yInvEntry < 0.0 then 1.0 else -1.0
+    normal = if xEntry > yEntry then vec nx 0.0 else if xEntry < yEntry then vec 0.0 ny else vec nx ny
     r = if entryTime > exitTime || xEntry < 0.0 && yEntry < 0.0 || xEntry > 1.0 || yEntry > 1.0
         then Nothing
-        else Just { time: entryTime, normal: vec nan nan }
+        else Just {
+          time: entryTime,
+          normal: normal
+        }

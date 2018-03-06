@@ -80,23 +80,14 @@ function sweepAABB(v, a, b) {
   if (entryTime > exitTime || xEntry < 0 && yEntry < 0 || xEntry > 1 || yEntry > 1) {
     return null;
   } else {
+    const nx = xInvEntry < 0 ? 1 : -1;
+    const ny = yInvEntry < 0 ? 1 : -1;
     if (xEntry > yEntry) {
-      if (xInvEntry < 0) {
-        return {time: entryTime, normal: vec(1, 0)};
-      } else {
-        return {time: entryTime, normal: vec(-1, 0)};
-      }
+      return {time: entryTime, normal: vec(nx, 0)};
     } else if (xEntry < yEntry) {
-      if (yInvEntry < 0) {
-        return {time: entryTime, normal: vec(0, 1)};
-      } else {
-        return {time: entryTime, normal: vec(0, -1)};
-      }
+      return {time: entryTime, normal: vec(0, ny)};
     } else {
-      return {
-        time: entryTime,
-        normal: vec(xInvEntry > 0 ? -1 : 1, xInvEntry > 0 ? -1 : 1)
-      };
+      return {time: entryTime, normal: vec(nx, ny)};
     }
   }
 }
