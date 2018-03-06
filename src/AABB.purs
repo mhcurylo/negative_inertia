@@ -36,8 +36,12 @@ intersectAABBtoAABB x y
     }
 
 -- | *** NOT TESTED ***
+-- |
 -- | Find intersection time (0..1 inclusive) of moving AABB to static AABB
 -- | First argument is velocity of first AABB
+-- |
+-- | Based on https://www.gamedev.net/articles/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/
+-- |
 sweepAABB :: Vector -> AABB -> AABB -> Maybe Number
 sweepAABB v a b = Just 1.0
   where
