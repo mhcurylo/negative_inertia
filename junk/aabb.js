@@ -90,12 +90,12 @@ function sweepAABB(v, a, b) {
         // normal = 0 -1
       }
     }
-    return entryTime;
+    return {time: entryTime, normal: null};
   }
 }
 
 assert.deepEqual(null, sweepAABB({x: 0, y: 0}, fromRect(0, 0, 1, 1), fromRect(1, 0, 1, 1)));
-assert.deepEqual(0.25, sweepAABB({x: 4, y: 0}, fromRect(0, 0, 1, 1), fromRect(2, 0, 1, 1)));
-assert.deepEqual(0.25, sweepAABB({x: 0, y: 4}, fromRect(0, 0, 1, 1), fromRect(0, 2, 1, 1)));
-assert.deepEqual(0.50, sweepAABB({x: 2, y: 2}, fromRect(0, 0, 1, 1), fromRect(2, 2, 1, 1)));
-assert.deepEqual(0.50, sweepAABB({x: -2, y: -2}, fromRect(2, 2, 1, 1), fromRect(0, 0, 1, 1)));
+assert.deepEqual({time: 0.25, normal: null}, sweepAABB({x: 4, y: 0}, fromRect(0, 0, 1, 1), fromRect(2, 0, 1, 1)));
+assert.deepEqual({time: 0.25, normal: null}, sweepAABB({x: 0, y: 4}, fromRect(0, 0, 1, 1), fromRect(0, 2, 1, 1)));
+assert.deepEqual({time: 0.50, normal: null}, sweepAABB({x: 2, y: 2}, fromRect(0, 0, 1, 1), fromRect(2, 2, 1, 1)));
+assert.deepEqual({time: 0.50, normal: null}, sweepAABB({x: -2, y: -2}, fromRect(2, 2, 1, 1), fromRect(0, 0, 1, 1)));
