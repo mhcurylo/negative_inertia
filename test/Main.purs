@@ -12,6 +12,7 @@ import Test.Unit.Console (TESTOUTPUT)
 import Test.Unit.QuickCheck (quickCheck)
 
 import Test.QuickCheck (Result(), (===))
+import Test.AABB (testAABB)
 
 theCommutativeProperty :: Int -> Int -> Result
 theCommutativeProperty a b = (a + b) === (b + a)
@@ -20,3 +21,4 @@ main :: forall t8. Eff (console :: CONSOLE, testOutput :: TESTOUTPUT, avar :: AV
 main = runTest do
   test "the commutative property" do
     quickCheck theCommutativeProperty
+  testAABB
