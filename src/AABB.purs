@@ -3,7 +3,7 @@ module AABB(AABB, fromPhysical, intersectAABBtoAABB) where
 import Prelude
 import Data.Number (infinity)
 import Math (max)
-import Types (Physical, Vector, getX, getY)
+import Types (Physical, Vector, getX, getY, vec)
 import Data.Maybe (Maybe(..))
 
 type AABB = {
@@ -36,13 +36,14 @@ intersectAABBtoAABB x y
     }
 
 -- | *** NOT TESTED ***
+-- | Lacks returning collision normal
 -- |
 -- | Find intersection time (0..1 inclusive) of moving AABB to static AABB
 -- | First argument is velocity of first AABB
 -- |
 -- | Based on https://www.gamedev.net/articles/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/
 -- |
-sweepAABB :: Vector -> AABB -> AABB -> Maybe Number
+sweepAABB :: Vector -> AABB -> AABB -> Maybe { time :: Number, normal :: Vector }
 sweepAABB v a b = r
   where
     vx = getX v
@@ -59,4 +60,4 @@ sweepAABB v a b = r
     exitTime = max xExit yExit
     r = if entryTime > exitTime || xEntry < 0.0 && yEntry < 0.0 || xEntry > 1.0 || yEntry > 1.0
         then Nothing
-        else Just entryTime
+        else Just { time: entryTime, normal: vec infinity infinity }
