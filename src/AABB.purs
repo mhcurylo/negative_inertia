@@ -1,10 +1,15 @@
-module AABB(AABB, fromPhysical, intersectAABBtoAABB) where
+module AABB(AABB, fromPhysical, sweepAABB, Collision) where
 
 import Prelude
 import Data.Number (infinity, nan)
 import Math (max)
 import Types (Physical, Vector, getX, getY, vec)
 import Data.Maybe (Maybe(..))
+
+type Collision = {
+  time :: Number,
+  normal :: Vector
+}
 
 type AABB = {
   top :: Number,
@@ -13,6 +18,7 @@ type AABB = {
   left :: Number
 }
 
+-- | Gets AABB that wraps Physical
 fromPhysical :: Physical -> AABB
 fromPhysical x = {  
     top: getY x.pos,
