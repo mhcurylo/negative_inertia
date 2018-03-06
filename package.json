@@ -15,6 +15,7 @@
     "webpack:server:debug": "DEBUG=purs-loader* DEBUG_DEPTH=100 webpack-dev-server --progress --inline --hot",
     "purs:compile": "purs compile 'bower_components/purescript-*/src/**/*.purs' 'src/**/*.purs'",
     "purs:bundle": "purs bundle output/**/*.js",
+    "test": "pulp test",
     "start": "npm run webpack:server"
   },
   "dependencies": {

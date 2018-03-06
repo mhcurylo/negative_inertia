@@ -58,7 +58,7 @@ collision a b L = Tuple a' b'
   b' = b {vel = b.vel * xcVec }      
 collision a b R = Tuple a' b' 
   where
-  a' = a {vel = a.vel * xcVec + b.vel, pos = setX (getX b.pos + b.size + 0.1) a.pos}      
+  a' = a {vel = a.vel * xcVec + b.vel, pos = setX (getX b.pos + getX b.size + 0.1) a.pos}      
   b' = b {vel = b.vel * xcVec }      
 
 didCollide :: Physical -> Physical -> Maybe Direction
