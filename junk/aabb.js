@@ -58,3 +58,47 @@ assert.deepEqual(
   ),
   {top: 5, left: 0, right: 1, bottom: 6}
 );
+
+/**
+ * https://www.gamedev.net/articles/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/
+ */
+function sweepAABB(a, b, v) {
+  const xInvEntry = v.x > 0 ? b.left - a.right : b.right - a.left;
+  const xInvExit = v.x > 0 ? b.right - a.left : b.left - a.right;
+  const yInvEntry = v.y > 0 ? b.top - a.bottom : b.bottom - a.top;
+  const yInvExit = v.y > 0 ? b.bottom - a.top : b.top - a.bottom;
+  const xEntry = v.x === 0 ? -Infinity : xInvEntry / v.x;
+  const xExit = v.x === 0 ? Infinity : xInvExit / v.x;
+  const yEntry = v.y === 0 ? -Infinity : yInvEntry / v.y;
+  const yExit = v.y === 0 ? Infinity : yInvExit / v.y;
+  const entryTime = Math.max(xEntry, yEntry);
+  const exitTime = Math.max(xExit, yExit);
+  if (entryTime > exitTime || xEntry < 0 && yEntry < 0 || xEntry > 1 || yEntry > 1) {
+    // normal = 0 0
+    return 1;
+  } else {
+    if (xEntry > yEntry) {
+      if (xInvEntry < 0) {
+        // normal = 1 0
+      } else {
+        // normal = -1 0
+      }
+    } else {
+      if (yInvEntry < 0) {
+        // normal = 0 1
+      } else {
+        // normal = 0 -1
+      }
+    }
+    return entryTime;
+  }
+}
+
+assert.deepEqual(
+  sweepAABB(
+    fromRect(0, 0, 1, 1),
+    fromRect(1, 0, 1, 1),
+    {x: 0, y: 0}
+  ),
+  1.0
+);
