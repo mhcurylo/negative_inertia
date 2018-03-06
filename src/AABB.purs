@@ -41,8 +41,6 @@ intersectAABBtoAABB x y
       left: if x.left >= y.left && x.left <= y.right then x.left else y.left
     }
 
--- | *** NOT TESTED ***
--- |
 -- | Find intersection time (0..1 inclusive) of moving AABB to static AABB
 -- | First argument is velocity of first AABB
 -- |
