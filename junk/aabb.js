@@ -62,7 +62,7 @@ assert.deepEqual(
 /**
  * https://www.gamedev.net/articles/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/
  */
-function sweepAABB(a, b, v) {
+function sweepAABB(v, a, b) {
   const xInvEntry = v.x > 0 ? b.left - a.right : b.right - a.left;
   const xInvExit = v.x > 0 ? b.right - a.left : b.left - a.right;
   const yInvEntry = v.y > 0 ? b.top - a.bottom : b.bottom - a.top;
@@ -75,7 +75,7 @@ function sweepAABB(a, b, v) {
   const exitTime = Math.max(xExit, yExit);
   if (entryTime > exitTime || xEntry < 0 && yEntry < 0 || xEntry > 1 || yEntry > 1) {
     // normal = 0 0
-    return 1;
+    return null;
   } else {
     if (xEntry > yEntry) {
       if (xInvEntry < 0) {
@@ -94,11 +94,8 @@ function sweepAABB(a, b, v) {
   }
 }
 
-assert.deepEqual(
-  sweepAABB(
-    fromRect(0, 0, 1, 1),
-    fromRect(1, 0, 1, 1),
-    {x: 0, y: 0}
-  ),
-  1.0
-);
+assert.deepEqual(null, sweepAABB({x: 0, y: 0}, fromRect(0, 0, 1, 1), fromRect(1, 0, 1, 1)));
+assert.deepEqual(0.25, sweepAABB({x: 4, y: 0}, fromRect(0, 0, 1, 1), fromRect(2, 0, 1, 1)));
+assert.deepEqual(0.25, sweepAABB({x: 0, y: 4}, fromRect(0, 0, 1, 1), fromRect(0, 2, 1, 1)));
+assert.deepEqual(0.50, sweepAABB({x: 2, y: 2}, fromRect(0, 0, 1, 1), fromRect(2, 2, 1, 1)));
+assert.deepEqual(0.50, sweepAABB({x: -2, y: -2}, fromRect(2, 2, 1, 1), fromRect(0, 0, 1, 1)));
