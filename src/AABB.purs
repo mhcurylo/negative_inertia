@@ -36,7 +36,6 @@ intersectAABBtoAABB x y
     }
 
 -- | *** NOT TESTED ***
--- | Lacks returning collision normal
 -- |
 -- | Find intersection time (0..1 inclusive) of moving AABB to static AABB
 -- | First argument is velocity of first AABB
