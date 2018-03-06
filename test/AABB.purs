@@ -1,23 +1,14 @@
 module Test.AABB(testAABB) where
 
-import Prelude
-
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE)
 import Control.Monad.Eff.Random (RANDOM)
-import Control.Monad.Eff.AVar (AVAR)
 import Test.Unit (test, TestF)
-import Test.Unit.Main (runTest)
 import Control.Monad.Free (Free)
-import Test.Unit.Console (TESTOUTPUT)
 import Test.Unit.QuickCheck (quickCheck)
-import Test.QuickCheck (Result(), (===))
-import Control.Monad.Aff (runAff, Aff)
-import Data.Maybe
-import Data.Boolean
-import AABB
-import Types
-import Prelude
+import Control.Monad.Aff (Aff)
+import Data.Maybe (Maybe(..))
+import AABB (AABB, Collision, sweepAABB)
+import Types (vec)
+import Prelude (Unit, discard, negate, ($), (&&), (+), (==))
 
 sameCollision :: Maybe Collision -> Maybe Collision -> Boolean
 sameCollision (Just a) (Just b) = a.time == b.time && a.normal == b.normal
