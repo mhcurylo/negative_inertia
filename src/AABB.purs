@@ -1,7 +1,7 @@
 module AABB(AABB, fromPhysical, intersectAABBtoAABB) where
 
 import Prelude
-import Data.Number (infinity)
+import Data.Number (infinity, nan)
 import Math (max)
 import Types (Physical, Vector, getX, getY, vec)
 import Data.Maybe (Maybe(..))
@@ -60,4 +60,4 @@ sweepAABB v a b = r
     exitTime = max xExit yExit
     r = if entryTime > exitTime || xEntry < 0.0 && yEntry < 0.0 || xEntry > 1.0 || yEntry > 1.0
         then Nothing
-        else Just { time: entryTime, normal: vec infinity infinity }
+        else Just { time: entryTime, normal: vec nan nan }
