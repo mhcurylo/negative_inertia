@@ -43,7 +43,7 @@ intersectAABBtoAABB x y
 -- | Based on https://www.gamedev.net/articles/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/
 -- |
 sweepAABB :: Vector -> AABB -> AABB -> Maybe Number
-sweepAABB v a b = Just 1.0
+sweepAABB v a b = r
   where
     vx = getX v
     vy = getY v
