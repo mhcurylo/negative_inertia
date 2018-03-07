@@ -2,10 +2,11 @@ module Game (gameLoop, initialGameState) where
 
 import Prelude
 import Types 
+import Math (abs)
 import Collision (collide)
 import Data.Maybe (Maybe(..), isJust, fromJust, fromMaybe)
 import Data.Tuple (Tuple(Tuple), fst, snd)
-import Data.Array (head, filter)
+import Data.Array
 import Control.Biapply ((<<*>>))
 import AABB
 import Trace
@@ -49,14 +50,29 @@ accelerate p@{pos, vel, acc, inertia} = p {
 firstJust :: forall a . Array (Maybe a) -> Maybe a
 firstJust = join <<< head <<< filter isJust 
 
+go :: forall a. (a -> a -> Tuple a a) -> a -> Array a -> Array a
+go f x s = case uncons s of 
+             Just {head: y, tail: xs} ->
+               case f x y of
+                 Tuple xx yy -> y : (go f x xs)
+             Nothing -> s
+
 pong :: GameState -> GameState
 pong gs = r
   where
+    physicals = [
+      gs.ball,
+      fst gs.paddles,
+      snd gs.paddles,
+      fst gs.walls,
+      snd gs.walls
+    ]
+    
     rightPaddle = snd gs.paddles
     xx = fromPhysical gs.ball
     yy = fromPhysical rightPaddle
-    -- _ = trace [xx.right, yy.left, xx.right - yy.left]
     intersection = sweepPhysicals gs.ball rightPaddle
+    _ = trace intersection
     r = if isJust intersection
         then gs {
           ball = gs.ball {
