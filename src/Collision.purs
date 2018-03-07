@@ -66,7 +66,7 @@ didCollide a b = if maxX >= 0.0
                    && maxY >= 0.0
                    && minY <= 0.0 
                    && minX <= 0.0 
-  then spy <$> snd <$> (minimumBy (comparing fst) $ zip [maxY, maxX, (-minY), (-minX)] [T, R, B, L])
+  then snd <$> (minimumBy (comparing fst) $ zip [maxY, maxX, (-minY), (-minX)] [T, R, B, L])
   else Nothing
   where
   (MinkowskiDifference {mTop, mBottom}) = minkowskiDifference a b      

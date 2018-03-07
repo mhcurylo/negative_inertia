@@ -1,9 +1,10 @@
-module AABB(AABB, fromPhysical, sweepAABB, Collision) where
+module AABB(AABB, fromPhysical, sweepAABB, Collision, sweepPhysicals) where
 
 import Prelude
 import Data.Number (infinity, nan)
 import Math (max)
 import Types (Physical, Vector, getX, getY, vec)
+import Trace
 import Data.Maybe (Maybe(..))
 
 type Collision = {
@@ -18,7 +19,7 @@ type AABB = {
   left :: Number
 }
 
--- | Gets AABB that wraps Physical
+-- | Gets AABB that wraps a Physical
 fromPhysical :: Physical -> AABB
 fromPhysical x = {  
     top: getY x.pos,
@@ -41,12 +42,18 @@ intersectAABBtoAABB x y
       left: if x.left >= y.left && x.left <= y.right then x.left else y.left
     }
 
+-- | Test two "physicals" for collision
+sweepPhysicals :: Physical -> Physical -> Maybe Collision
+sweepPhysicals a b = sweepAABB v (fromPhysical a) (fromPhysical b)
+  where
+    v = a.vel - b.vel
+
 -- | Find intersection time (0..1 inclusive) of moving AABB to static AABB
 -- | First argument is velocity of first AABB
 -- |
 -- | Based on https://www.gamedev.net/articles/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/
 -- |
-sweepAABB :: Vector -> AABB -> AABB -> Maybe { time :: Number, normal :: Vector }
+sweepAABB :: Vector -> AABB -> AABB -> Maybe Collision
 sweepAABB v a b = r
   where
     vx = getX v

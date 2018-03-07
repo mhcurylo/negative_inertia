@@ -4,10 +4,11 @@ import Prelude
 import Types 
 import Collision (collide)
 import Data.Maybe (Maybe(..), isJust, fromJust, fromMaybe)
-import Data.Tuple (Tuple(Tuple), fst)
+import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Array (head, filter)
 import Control.Biapply ((<<*>>))
--- import Debug.Trace
+import AABB
+import Trace
 
 accBall :: Ball -> Ball
 accBall b = b {vel = vec 2.0 0.0}
@@ -37,7 +38,7 @@ playerMoves pms gs@({paddles}) = gs { paddles = (both movePlayer pms <<*>> paddl
 
 move :: GameState -> GameState
 move gs@{ball, paddles} = gs {ball = accelerate ball, paddles = both accelerate paddles}
-
+ 
 accelerate :: Physical -> Physical 
 accelerate p@{pos, vel, acc, inertia} = p {
     pos = pos + vel
@@ -49,7 +50,23 @@ firstJust :: forall a . Array (Maybe a) -> Maybe a
 firstJust = join <<< head <<< filter isJust 
 
 pong :: GameState -> GameState
-pong gs@{ball, paddles: (Tuple p1 p2), walls: (Tuple w1 w2)} = gs {
+pong gs = r
+  where
+    rightPaddle = snd gs.paddles
+    xx = fromPhysical gs.ball
+    yy = fromPhysical rightPaddle
+    -- _ = trace [xx.right, yy.left, xx.right - yy.left]
+    intersection = sweepPhysicals gs.ball rightPaddle
+    r = if isJust intersection
+        then gs {
+          ball = gs.ball {
+            vel = vec 0.0 0.0
+          }
+        }
+        else gs
+
+pongx :: GameState -> GameState
+pongx gs@{ball, paddles: (Tuple p1 p2), walls: (Tuple w1 w2)} = gs {
        ball = fromMaybe ball $ fst <$> firstJust (collide ball <$> [p1, p2, w1, w2])
      , paddles = Tuple (collideWalls p1) (collideWalls p2) 
   }

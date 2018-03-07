@@ -6,8 +6,8 @@ import Control.Monad.Free (Free)
 import Test.Unit.QuickCheck (quickCheck)
 import Control.Monad.Aff (Aff)
 import Data.Maybe (Maybe(..))
-import AABB (AABB, Collision, sweepAABB)
-import Types (vec)
+import AABB (AABB, Collision, sweepPhysicals, sweepAABB)
+import Types (createBox, vec, Vector, Physical)
 import Prelude (Unit, discard, negate, ($), (&&), (+), (==))
 
 sameCollision :: Maybe Collision -> Maybe Collision -> Boolean
@@ -22,8 +22,17 @@ qc x y = quickCheck $ sameCollision x y
 fromRect :: Number -> Number -> Number -> Number -> AABB
 fromRect x y w h = {top: y, right: x + w, bottom: y + h, left: x}
 
+setVel :: Vector -> Physical -> Physical
+setVel v p = p { vel = v }
+
 testAABB :: forall a. Free (TestF ( random :: RANDOM | a)) Unit
 testAABB = do
+  test "sweepPhysicals" do
+    qc Nothing (sweepPhysicals (createBox 1.0 1.0 0.0 0.0) (createBox 1.0 1.0 2.0 0.0))
+    qc (Just {time: 0.25, normal: vec (-1.0) 0.0})
+       (sweepPhysicals (setVel (vec 4.0 0.0) (createBox 1.0 1.0 0.0 0.0))
+                       (createBox 1.0 1.0 2.0 0.0))
+
   test "sweepAABB" do
     qc Nothing (sweepAABB (vec 0.0 0.0) (fromRect 0.0 0.0 1.0 1.0) (fromRect 1.0 0.0 1.0 1.0))
     qc (Just {time: 0.25, normal: vec (-1.0) 0.0})    (sweepAABB (vec 4.0 0.0)       (fromRect 0.0 0.0 1.0 1.0) (fromRect 2.0 0.0 1.0 1.0))
