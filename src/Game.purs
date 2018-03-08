@@ -38,10 +38,10 @@ playerMoves :: PlayerMoves -> GameState -> GameState
 playerMoves pms gs@({paddles}) = gs { paddles = (both movePlayer pms <<*>> paddles) }
 
 move :: GameState -> GameState
-move gs@{ball, paddles} = gs {ball = accelerate ball, paddles = both accelerate paddles}
+move gs@{ball, paddles} = gs {ball = movePhysical ball, paddles = both movePhysical paddles}
  
-accelerate :: Physical -> Physical 
-accelerate p@{pos, vel, acc, inertia} = p {
+movePhysical :: Physical -> Physical 
+movePhysical p@{pos, vel, acc, inertia} = p {
     pos = pos + vel
   , vel = vel + acc - (vel * inertia) 
   , acc = acc 
@@ -50,36 +50,8 @@ accelerate p@{pos, vel, acc, inertia} = p {
 firstJust :: forall a . Array (Maybe a) -> Maybe a
 firstJust = join <<< head <<< filter isJust 
 
-go :: forall a. (a -> a -> Tuple a a) -> a -> Array a -> Array a
-go f x s = case uncons s of 
-             Just {head: y, tail: xs} ->
-               case f x y of
-                 Tuple xx yy -> y : (go f x xs)
-             Nothing -> s
-
 pong :: GameState -> GameState
-pong gs = r
-  where
-    physicals = [
-      gs.ball,
-      fst gs.paddles,
-      snd gs.paddles,
-      fst gs.walls,
-      snd gs.walls
-    ]
-    
-    rightPaddle = snd gs.paddles
-    xx = fromPhysical gs.ball
-    yy = fromPhysical rightPaddle
-    intersection = sweepPhysicals gs.ball rightPaddle
-    _ = trace intersection
-    r = if isJust intersection
-        then gs {
-          ball = gs.ball {
-            vel = vec 0.0 0.0
-          }
-        }
-        else gs
+pong gs = gs
 
 pongx :: GameState -> GameState
 pongx gs@{ball, paddles: (Tuple p1 p2), walls: (Tuple w1 w2)} = gs {
