@@ -81,14 +81,6 @@ pong gs = gs {
     col2 = sweepPhysicals gs.ball (snd gs.paddles)
     r = maybe (maybe (moveBall gs.ball) (deflectBall gs.ball) col2) (deflectBall gs.ball) col1
 
-pongx :: GameState -> GameState
-pongx gs@{ball, paddles: (Tuple p1 p2), walls: (Tuple w1 w2)} = gs {
-       ball = fromMaybe ball $ fst <$> firstJust (collide ball <$> [p1, p2, w1, w2])
-     , paddles = Tuple (collideWalls p1) (collideWalls p2) 
-  }
-  where
-  collideWalls pad = fromMaybe pad $ fst <$> firstJust (collide pad <$> [w1, w2])      
-
 score :: GameState -> GameState
 score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0
   then initialGameState {scores = Tuple p1 (p2 + 1)}
