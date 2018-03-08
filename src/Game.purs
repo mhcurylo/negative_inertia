@@ -38,7 +38,7 @@ playerMoves :: PlayerMoves -> GameState -> GameState
 playerMoves pms gs@({paddles}) = gs { paddles = (both movePlayer pms <<*>> paddles) }
 
 move :: GameState -> GameState
-move gs@{ball, paddles} = gs {ball = movePhysical ball, paddles = both movePhysical paddles}
+move gs@{ball, paddles} = gs {ball = ball, paddles = both movePhysical paddles}
  
 movePhysical :: Physical -> Physical 
 movePhysical p@{pos, vel, acc} = p {
@@ -50,8 +50,32 @@ movePhysical p@{pos, vel, acc} = p {
 firstJust :: forall a . Array (Maybe a) -> Maybe a
 firstJust = join <<< head <<< filter isJust 
 
+deflect :: Vector -> Vector -> Vector
+deflect vel normal = mulV vel (vec nx ny) 
+  where
+    p x = abs x > 0.0
+    nx = if p (getX normal) then (-1.0) else 1.0
+    ny = if p (getY normal) then (-1.0) else 1.0
+
+collideBallPaddle :: Physical -> Collision -> Physical
+collideBallPaddle ball {time: time, normal: normal} =
+  ball {
+    pos = ball.pos + scale time ball.vel,
+    vel = deflect ball.vel normal
+  }
+
 pong :: GameState -> GameState
-pong gs = gs
+pong gs =
+  case sweepPhysicals gs.ball (snd gs.paddles) of
+    Just colllision -> gs {
+      ball = collideBallPaddle gs.ball colllision
+    }
+    Nothing -> gs {
+      ball = gs.ball {
+        pos = gs.ball.pos + gs.ball.vel
+      }
+    }
+
 
 pongx :: GameState -> GameState
 pongx gs@{ball, paddles: (Tuple p1 p2), walls: (Tuple w1 w2)} = gs {
