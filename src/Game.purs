@@ -4,7 +4,7 @@ import Prelude
 import Types 
 import Math (abs)
 import Collision (collide)
-import Data.Maybe (Maybe(..), isJust, fromJust, fromMaybe)
+import Data.Maybe
 import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Array
 import Control.Biapply ((<<*>>))
@@ -57,25 +57,29 @@ deflect vel normal = mulV vel (vec nx ny)
     nx = if p (getX normal) then (-1.0) else 1.0
     ny = if p (getY normal) then (-1.0) else 1.0
 
-collideBallPaddle :: Physical -> Collision -> Physical
-collideBallPaddle ball {time: time, normal: normal} =
+deflectBall :: Physical -> Collision -> Physical
+deflectBall ball {time: time, normal: normal} =
   ball {
     pos = ball.pos + scale time ball.vel,
     vel = deflect ball.vel normal
   }
+  where
+    deflectedVel = deflect ball.vel normal
+    pos = ball.pos + scale time ball.vel + scale (1.0 - time) deflectedVel
+
+moveBall :: Physical -> Physical
+moveBall ball = ball {
+    pos = ball.pos + ball.vel
+  }
 
 pong :: GameState -> GameState
-pong gs =
-  case sweepPhysicals gs.ball (snd gs.paddles) of
-    Just colllision -> gs {
-      ball = collideBallPaddle gs.ball colllision
-    }
-    Nothing -> gs {
-      ball = gs.ball {
-        pos = gs.ball.pos + gs.ball.vel
-      }
-    }
-
+pong gs = gs {
+    ball = r
+  }
+  where
+    col1 = sweepPhysicals gs.ball (fst gs.paddles)
+    col2 = sweepPhysicals gs.ball (snd gs.paddles)
+    r = maybe (maybe (moveBall gs.ball) (deflectBall gs.ball) col2) (deflectBall gs.ball) col1
 
 pongx :: GameState -> GameState
 pongx gs@{ball, paddles: (Tuple p1 p2), walls: (Tuple w1 w2)} = gs {
