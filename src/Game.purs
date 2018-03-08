@@ -41,9 +41,9 @@ move :: GameState -> GameState
 move gs@{ball, paddles} = gs {ball = movePhysical ball, paddles = both movePhysical paddles}
  
 movePhysical :: Physical -> Physical 
-movePhysical p@{pos, vel, acc, inertia} = p {
+movePhysical p@{pos, vel, acc} = p {
     pos = pos + vel
-  , vel = vel + acc - (vel * inertia) 
+  , vel = vel + acc
   , acc = acc 
   } 
 
