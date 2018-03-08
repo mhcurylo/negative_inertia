@@ -60,12 +60,11 @@ deflect vel normal = mulV vel (vec nx ny)
 deflectBall :: Physical -> Collision -> Physical
 deflectBall ball {time: time, normal: normal} =
   ball {
-    pos = ball.pos + scale time ball.vel,
+    pos = ball.pos + scale time ball.vel + scale (1.0 - time) deflectedVel,
     vel = deflect ball.vel normal
   }
   where
     deflectedVel = deflect ball.vel normal
-    pos = ball.pos + scale time ball.vel + scale (1.0 - time) deflectedVel
 
 moveBall :: Physical -> Physical
 moveBall ball = ball {
