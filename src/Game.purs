@@ -2,12 +2,14 @@ module Game (gameLoop, initialGameState) where
 
 import Prelude
 import Types 
+import Math (abs)
 import Collision (collide)
-import Data.Maybe (Maybe(..), isJust, fromJust, fromMaybe)
-import Data.Tuple (Tuple(Tuple), fst)
-import Data.Array (head, filter)
+import Data.Maybe
+import Data.Tuple (Tuple(Tuple), fst, snd)
+import Data.Array
 import Control.Biapply ((<<*>>))
--- import Debug.Trace
+import AABB
+import Trace
 
 accBall :: Ball -> Ball
 accBall b = b {vel = vec 2.0 0.0}
@@ -36,25 +38,47 @@ playerMoves :: PlayerMoves -> GameState -> GameState
 playerMoves pms gs@({paddles}) = gs { paddles = (both movePlayer pms <<*>> paddles) }
 
 move :: GameState -> GameState
-move gs@{ball, paddles} = gs {ball = accelerate ball, paddles = both accelerate paddles}
-
-accelerate :: Physical -> Physical 
-accelerate p@{pos, vel, acc, inertia} = p {
+move gs@{ball, paddles} = gs {ball = ball, paddles = both movePhysical paddles}
+ 
+movePhysical :: Physical -> Physical 
+movePhysical p@{pos, vel, acc} = p {
     pos = pos + vel
-  , vel = vel + acc - (vel * inertia) 
+  , vel = vel + acc
   , acc = acc 
   } 
 
 firstJust :: forall a . Array (Maybe a) -> Maybe a
 firstJust = join <<< head <<< filter isJust 
 
-pong :: GameState -> GameState
-pong gs@{ball, paddles: (Tuple p1 p2), walls: (Tuple w1 w2)} = gs {
-       ball = fromMaybe ball $ fst <$> firstJust (collide ball <$> [p1, p2, w1, w2])
-     , paddles = Tuple (collideWalls p1) (collideWalls p2) 
+deflect :: Vector -> Vector -> Vector
+deflect vel normal = mulV vel (vec nx ny) 
+  where
+    p x = abs x > 0.0
+    nx = if p (getX normal) then (-1.0) else 1.0
+    ny = if p (getY normal) then (-1.0) else 1.0
+
+deflectBall :: Physical -> Collision -> Physical
+deflectBall ball {time: time, normal: normal} =
+  ball {
+    pos = ball.pos + scale time ball.vel + scale (1.0 - time) deflectedVel,
+    vel = deflect ball.vel normal
   }
   where
-  collideWalls pad = fromMaybe pad $ fst <$> firstJust (collide pad <$> [w1, w2])      
+    deflectedVel = deflect ball.vel normal
+
+moveBall :: Physical -> Physical
+moveBall ball = ball {
+    pos = ball.pos + ball.vel
+  }
+
+pong :: GameState -> GameState
+pong gs = gs {
+    ball = r
+  }
+  where
+    col1 = sweepPhysicals gs.ball (fst gs.paddles)
+    col2 = sweepPhysicals gs.ball (snd gs.paddles)
+    r = maybe (maybe (moveBall gs.ball) (deflectBall gs.ball) col2) (deflectBall gs.ball) col1
 
 score :: GameState -> GameState
 score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0
