@@ -1,12 +1,8 @@
 module Draw (drawGameState) where
 
-import Prelude 
-
+import Prelude (join, show, ($), (<>))
 import Graphics.Drawing.Font (font, sansSerif, bold, Font)
-import Graphics.Drawing (scale, translate, shadowBlur, black, shadowColor, rgb,
-                         shadow, render, rotate, rectangle, closed, fillColor,
-                         fontString, text, white, filled, Drawing)
-                         
+import Graphics.Drawing (Drawing, black, fillColor, filled, rectangle, text, white)
 import Data.Tuple (Tuple(Tuple))
 import Data.Foldable (foldMap)
 

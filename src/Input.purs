@@ -24,13 +24,13 @@ keyMaps = Tuple (playerKeys 65 90) (playerKeys 38 40)
 mapToMove :: Set Int -> KeyMap -> Move
 mapToMove pressedKeys = fromMaybe Stay <<< head <<< values <<< filterKeys (flip member $ pressedKeys)
 
-keysToMove :: KeyMaps -> Set Int -> PlayerMoves
-keysToMove keyMaps pressedKeys = bimap toMove toMove keyMaps 
+keysToMove :: Set Int -> PlayerMoves
+keysToMove pressedKeys = bimap toMove toMove keyMaps 
   where
   toMove = mapToMove pressedKeys
 
 input :: ABehavior Event PlayerMoves
-input = keysToMove keyMaps <$> keys  
+input = keysToMove <$> keys  
 
 
 

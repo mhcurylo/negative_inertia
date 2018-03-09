@@ -1,15 +1,12 @@
 module Collision (Direction, collide, didCollide, minkowskiDifference, MinkowskiDifference) where
 
-import Prelude 
-import Types 
-import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
+import Prelude (class Show, comparing, max, min, negate, ($), (&&), (*), (+), (-), (<$>), (<=), (>=))
+import Types (Physical, Vector, getX, getY, setX, setY, subV, vec)
+import Data.Maybe (Maybe(Nothing))
 import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Foldable (minimumBy)
 import Data.Array (zip)
-import Control.Biapply ((<<*>>))
-import Control.Alt ((<|>))
 import Data.Generic (class Generic, gShow)
-import Debug.Trace
 
 data MinkowskiDifference = MinkowskiDifference {
     mTop :: Vector

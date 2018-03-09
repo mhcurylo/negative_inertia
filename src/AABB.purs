@@ -1,7 +1,7 @@
 module AABB(AABB, fromPhysical, sweepAABB, Collision, sweepPhysicals) where
 
-import Prelude
-import Data.Number (infinity, nan)
+import Prelude ((||), (&&), (>=), (<=), (>), (<), (-), (+), (/), (==), otherwise, negate)
+import Data.Number (infinity)
 import Math (max)
 import Types (Physical, Vector, getX, getY, vec)
 import Data.Maybe (Maybe(..))

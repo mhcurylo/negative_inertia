@@ -4,7 +4,6 @@ import Prelude
 
 import Data.Maybe (fromJust)
 import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (log, CONSOLE)
 import Control.Monad.Eff.Unsafe (unsafePerformEff)
 
 import Graphics.Drawing (render)
@@ -15,7 +14,6 @@ import GameEngine (animateGame)
 import Game (gameLoop, initialGameState)
 import Draw (drawGameState)
 import Input (input)
-import Types (GameState)
 
 import FRP (FRP)
 foreign import hot :: forall eff. Eff eff Unit
@@ -28,6 +26,7 @@ game = do
   _ <- animateGame input gameLoop initialGameState (render ctx <<< drawGameState)
   pure unit
 
+main :: Unit
 main = unsafePerformEff $ do
     game
     hot
