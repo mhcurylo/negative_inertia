@@ -9,7 +9,6 @@ import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Array
 import Control.Biapply ((<<*>>))
 import AABB
-import Trace
 
 accBall :: Ball -> Ball
 accBall b = b {vel = vec 2.0 0.0}

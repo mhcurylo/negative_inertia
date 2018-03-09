@@ -4,7 +4,6 @@ import Prelude
 import Data.Number (infinity, nan)
 import Math (max)
 import Types (Physical, Vector, getX, getY, vec)
-import Trace
 import Data.Maybe (Maybe(..))
 
 type Collision = {
