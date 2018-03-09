@@ -76,11 +76,15 @@ pong gs = gs {
     ball = r
   }
   where
-    col1 = sweepPhysicals gs.ball (fst gs.paddles)
-    col2 = sweepPhysicals gs.ball (snd gs.paddles)
-    col3 = sweepPhysicals gs.ball (fst gs.walls)
-    col4 = sweepPhysicals gs.ball (snd gs.walls)
-    r = maybe (maybe (moveBall gs.ball) (deflectBall gs.ball) col3) (deflectBall gs.ball) col4
+    things = [
+      fst gs.paddles,
+      snd gs.paddles,
+      fst gs.walls,
+      snd gs.walls
+    ]
+    r = case find isJust $ map (sweepPhysicals gs.ball) things of
+      Just x -> maybe (moveBall gs.ball) (deflectBall gs.ball) x
+      Nothing -> moveBall gs.ball
 
 score :: GameState -> GameState
 score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0
