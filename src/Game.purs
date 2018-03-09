@@ -12,7 +12,7 @@ import AABB
 import Trace
 
 accBall :: Ball -> Ball
-accBall b = b {vel = vec 2.0 0.0}
+accBall b = b {vel = vec 4.0 4.8}
 
 initialGameState :: GameState
 initialGameState = ({
@@ -78,7 +78,9 @@ pong gs = gs {
   where
     col1 = sweepPhysicals gs.ball (fst gs.paddles)
     col2 = sweepPhysicals gs.ball (snd gs.paddles)
-    r = maybe (maybe (moveBall gs.ball) (deflectBall gs.ball) col2) (deflectBall gs.ball) col1
+    col3 = sweepPhysicals gs.ball (fst gs.walls)
+    col4 = sweepPhysicals gs.ball (snd gs.walls)
+    r = maybe (maybe (moveBall gs.ball) (deflectBall gs.ball) col3) (deflectBall gs.ball) col4
 
 score :: GameState -> GameState
 score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0
