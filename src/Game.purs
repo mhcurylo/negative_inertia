@@ -1,11 +1,11 @@
 module Game (gameLoop, initialGameState) where
 
-import Prelude (join, negate, (+), (-), (<), (<<<), (>))
+import Prelude (map, ($), join, negate, (+), (-), (<), (<<<), (>))
 import Types
 import Math (abs)
-import Data.Maybe (Maybe, isJust, maybe)
+import Data.Maybe
 import Data.Tuple (Tuple(Tuple), fst, snd)
-import Data.Array (filter, head)
+import Data.Array
 import Control.Biapply ((<<*>>))
 import AABB (Collision, sweepPhysicals)
 
@@ -14,10 +14,10 @@ accBall b = b {vel = vec 4.0 4.8}
 
 initialGameState :: GameState
 initialGameState = ({
-    ball: accBall (createBall 495.0 300.0)
-  , paddles: Tuple (createPaddle 30.0 280.0) (createPaddle 960.0 280.0)
+    ball: accBall (createBall "ball" 495.0 300.0)
+  , paddles: Tuple (createPaddle "paddle1" 30.0 280.0) (createPaddle "paddle2" 960.0 280.0)
   , scores: Tuple 0 0
-  , walls: Tuple (createWall 35.0) (createWall 590.0)
+  , walls: Tuple (createWall "wall1" 35.0) (createWall "wall1" 590.0)
 })
 
 accUp :: Vector

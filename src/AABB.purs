@@ -2,13 +2,16 @@ module AABB(AABB, fromPhysical, sweepAABB, Collision, sweepPhysicals) where
 
 import Prelude ((||), (&&), (>=), (<=), (>), (<), (-), (+), (/), (==), otherwise, negate)
 import Data.Number (infinity)
-import Math (max)
+import Math (max, min)
 import Types (Physical, Vector, getX, getY, vec)
 import Data.Maybe (Maybe(..))
+import Debug.Trace
 
 type Collision = {
   time :: Number,
-  normal :: Vector
+  normal :: Vector,
+  yEntry :: Number,
+  xEntry :: Number
 }
 
 type AABB = {
@@ -43,9 +46,12 @@ intersectAABBtoAABB x y
 
 -- | Test two "physicals" for collision
 sweepPhysicals :: Physical -> Physical -> Maybe Collision
-sweepPhysicals a b = sweepAABB v (fromPhysical a) (fromPhysical b)
+sweepPhysicals a b = case r of
+              Just x -> (spy {x:Just x, a:a, b:b}).x
+              Nothing -> Nothing
   where
     v = a.vel - b.vel
+    r = sweepAABB v (fromPhysical a) (fromPhysical b)
 
 -- | Find intersection time (0..1 inclusive) of moving AABB to static AABB
 -- | First argument is velocity of first AABB
@@ -66,13 +72,15 @@ sweepAABB v a b = r
     yEntry = if vy == 0.0 then -infinity else yInvEntry / vy
     yExit = if vy == 0.0 then infinity else yInvExit / vy
     entryTime = max xEntry yEntry
-    exitTime = max xExit yExit
+    exitTime = min xExit yExit
     nx = if xInvEntry < 0.0 then 1.0 else -1.0
     ny = if yInvEntry < 0.0 then 1.0 else -1.0
     normal = if xEntry > yEntry then vec nx 0.0 else if xEntry < yEntry then vec 0.0 ny else vec nx ny
     r = if entryTime > exitTime || xEntry < 0.0 && yEntry < 0.0 || xEntry > 1.0 || yEntry > 1.0
         then Nothing
         else Just {
-          time: entryTime,
-          normal: normal
+          time: (spy {a: a, b: b, entryTime: entryTime}).entryTime,
+          normal: normal,
+          yEntry: yEntry,
+          xEntry: xEntry
         }

@@ -63,7 +63,8 @@ instance ringVector :: Ring Vector where
   sub = subV
 
 type Physical = {
-    pos  :: Vector 
+    name :: String
+  , pos  :: Vector 
   , vel  :: Vector
   , acc  :: Vector
   , size :: Vector
@@ -93,22 +94,23 @@ type GameState = {
     , scores :: Scores
 }
 
-createPhysical :: Number -> Number -> Number -> Number -> Physical
-createPhysical w h x y = ({
-    pos: vec x y
+createPhysical :: String -> Number -> Number -> Number -> Number -> Physical
+createPhysical name w h x y = ({
+    name: name
+  , pos: vec x y
   , acc: zeroVector
   , vel: zeroVector
   , size: vec w h
 }) 
 
-createBox :: Number -> Number -> Number -> Number -> Physical
+createBox :: String -> Number -> Number -> Number -> Number -> Physical
 createBox = createPhysical
 
-createPaddle :: Number -> Number -> Paddle
-createPaddle = createPhysical 20.0 70.0
+createPaddle :: String -> Number -> Number -> Paddle
+createPaddle name = createPhysical name 20.0 70.0
 
-createBall :: Number -> Number -> Ball
-createBall = createPhysical 15.0 15.0
+createBall :: String -> Number -> Number -> Ball
+createBall name = createPhysical name 15.0 15.0
 
-createWall :: Number -> Wall
-createWall = createBox 960.0 5.0 20.0
+createWall :: String -> Number -> Wall
+createWall name = createBox name 960.0 5.0 20.0
