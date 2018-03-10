@@ -9,7 +9,6 @@ import Data.Maybe (Maybe(..))
 import AABB (AABB, Collision, sweepPhysicals, sweepAABB)
 import Types (createBox, vec, Vector, Physical)
 import Prelude (Unit, discard, negate, ($), (&&), (+), (==))
-import Debug.Trace
 
 sameCollision :: Maybe Collision -> Maybe Collision -> Boolean
 sameCollision (Just a) (Just b) = a.time == b.time && a.normal == b.normal
@@ -29,10 +28,10 @@ setVel v p = p { vel = v }
 testAABB :: forall a. Free (TestF ( random :: RANDOM | a)) Unit
 testAABB = do
   test "sweepPhysicals" do
-    qc Nothing (sweepPhysicals (createBox "box1" 1.0 1.0 0.0 0.0) (createBox "box2" 1.0 1.0 2.0 0.0))
+    qc Nothing (sweepPhysicals (createBox 1.0 1.0 0.0 0.0) (createBox 1.0 1.0 2.0 0.0))
     qc (Just {time: 0.25, normal: vec (-1.0) 0.0})
-       (sweepPhysicals (setVel (vec 4.0 0.0) (createBox "box1" 1.0 1.0 0.0 0.0))
-                       (createBox "box2" 1.0 1.0 2.0 0.0))
+       (sweepPhysicals (setVel (vec 4.0 0.0) (createBox 1.0 1.0 0.0 0.0))
+                       (createBox 1.0 1.0 2.0 0.0))
 
   test "sweepAABB" do
     qc Nothing (sweepAABB (vec 0.0 0.0) (fromRect 0.0 0.0 1.0 1.0) (fromRect 1.0 0.0 1.0 1.0))
