@@ -1,15 +1,13 @@
 module Game (gameLoop, initialGameState) where
 
-import Prelude
-import Types 
+import Prelude (join, negate, (+), (-), (<), (<<<), (>))
+import Types
 import Math (abs)
-import Collision (collide)
-import Data.Maybe
+import Data.Maybe (Maybe, isJust, maybe)
 import Data.Tuple (Tuple(Tuple), fst, snd)
-import Data.Array
+import Data.Array (filter, head)
 import Control.Biapply ((<<*>>))
-import AABB
-import Trace
+import AABB (Collision, sweepPhysicals)
 
 accBall :: Ball -> Ball
 accBall b = b {vel = vec 2.0 0.0}

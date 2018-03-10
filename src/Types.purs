@@ -3,7 +3,7 @@ module Types where
 import Prelude 
 import Data.Tuple (Tuple)
 import Data.Bifunctor (bimap) 
-import Data.Generic (class Generic, gShow)
+import Data.Generic (class Generic)
 
 data Move = Up | Down | Stay
 
@@ -69,6 +69,7 @@ type Physical = {
   , size :: Vector
 }
 
+showPhysical :: Physical -> String
 showPhysical ({pos, size, vel}) = "Physical pos: " <> show pos <> ", size: " <> show size <> ", vel: " <> show vel <> ";"
 
 type Double a = Tuple a a
