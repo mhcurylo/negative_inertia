@@ -5,13 +5,10 @@ import Data.Number (infinity)
 import Math (max, min)
 import Types (Physical, Vector, getX, getY, vec)
 import Data.Maybe (Maybe(..))
-import Debug.Trace
 
 type Collision = {
   time :: Number,
-  normal :: Vector,
-  yEntry :: Number,
-  xEntry :: Number
+  normal :: Vector
 }
 
 type AABB = {
@@ -46,12 +43,9 @@ intersectAABBtoAABB x y
 
 -- | Test two "physicals" for collision
 sweepPhysicals :: Physical -> Physical -> Maybe Collision
-sweepPhysicals a b = case r of
-              Just x -> (spy {x:Just x, a:a, b:b}).x
-              Nothing -> Nothing
+sweepPhysicals a b = sweepAABB v (fromPhysical a) (fromPhysical b)
   where
     v = a.vel - b.vel
-    r = sweepAABB v (fromPhysical a) (fromPhysical b)
 
 -- | Find intersection time (0..1 inclusive) of moving AABB to static AABB
 -- | First argument is velocity of first AABB
@@ -79,8 +73,6 @@ sweepAABB v a b = r
     r = if entryTime > exitTime || xEntry < 0.0 && yEntry < 0.0 || xEntry > 1.0 || yEntry > 1.0
         then Nothing
         else Just {
-          time: (spy {a: a, b: b, entryTime: entryTime}).entryTime,
-          normal: normal,
-          yEntry: yEntry,
-          xEntry: xEntry
+          time: entryTime,
+          normal: normal
         }

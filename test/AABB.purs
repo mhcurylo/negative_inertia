@@ -42,3 +42,5 @@ testAABB = do
     qc (Just {time: 1.00, normal: vec 0.0 1.0})       (sweepAABB (vec 0.0 (-1.0))    (fromRect 2.0 2.0 1.0 1.0) (fromRect 0.0 0.0 1.0 1.0))
     qc (Just {time: 0.50, normal: vec (-1.0) (-1.0)}) (sweepAABB (vec 2.0 2.0)       (fromRect 0.0 0.0 1.0 1.0) (fromRect 2.0 2.0 1.0 1.0))
     qc (Just {time: 0.50, normal: vec (1.0) (1.0)})   (sweepAABB (vec (-2.0) (-2.0)) (fromRect 2.0 2.0 1.0 1.0) (fromRect 0.0 0.0 1.0 1.0))
+    -- Fails with max being used in exitTime instead of min
+    qc Nothing (sweepAABB (vec (4.0) (-4.8)) (fromRect 911.0 350.8 15.0 15.0) (fromRect 30.0 280.0 20.0 70.0))
