@@ -35,16 +35,6 @@ movePlayer Stay p = p {acc = accStay }
 playerMoves :: PlayerMoves -> GameState -> GameState
 playerMoves pms gs@({paddles}) = gs { paddles = (both movePlayer pms <<*>> paddles) }
 
-move :: GameState -> GameState
-move gs@{ball, paddles} = gs {ball = ball, paddles = both movePhysical paddles}
- 
-movePhysical :: Physical -> Physical 
-movePhysical p@{pos, vel, acc} = p {
-    pos = pos + vel
-  , vel = vel + acc
-  , acc = acc 
-  } 
-
 firstJust :: forall a . Array (Maybe a) -> Maybe a
 firstJust = join <<< head <<< filter isJust 
 
@@ -70,10 +60,14 @@ doPhysical thing s =
       Just x -> maybe (movePhysical thing) (deflectPhysical thing) x
       Nothing -> movePhysical thing
 
-pong :: GameState -> GameState
-pong gs = gs {
-    ball = doPhysical gs.ball [fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls]
+move :: GameState -> GameState
+move gs = gs {
+    ball = doPhysical gs.ball [fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls],
+    paddles = Tuple paddle1 paddle2
   }
+  where
+    paddle1 = doPhysical (fst gs.paddles) [fst gs.walls, snd gs.walls]
+    paddle2 = doPhysical (snd gs.paddles) [fst gs.walls, snd gs.walls]
 
 score :: GameState -> GameState
 score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0
@@ -85,4 +79,4 @@ score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0
   bx = getX ball.pos      
 
 gameLoop :: PlayerMoves -> GameState -> GameState
-gameLoop pm = score <<< pong <<< move <<< playerMoves pm
+gameLoop pm = score <<< move <<< playerMoves pm
