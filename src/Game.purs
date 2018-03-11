@@ -55,8 +55,8 @@ deflect vel normal = mulV vel (vec nx ny)
     nx = if p (getX normal) then (-1.0) else 1.0
     ny = if p (getY normal) then (-1.0) else 1.0
 
-deflectBall :: Physical -> Collision -> Physical
-deflectBall ball {time: time, normal: normal} =
+deflectPhysical :: Physical -> Collision -> Physical
+deflectPhysical ball {time: time, normal: normal} =
   ball {
     pos = ball.pos + scale time ball.vel + scale (1.0 - time) deflectedVel,
     vel = deflect ball.vel normal
@@ -64,25 +64,16 @@ deflectBall ball {time: time, normal: normal} =
   where
     deflectedVel = deflect ball.vel normal
 
-moveBall :: Physical -> Physical
-moveBall ball = ball {
-    pos = ball.pos + ball.vel
-  }
+doPhysical :: Physical -> Array Physical -> Physical
+doPhysical thing s =
+    case find isJust $ map (sweepPhysicals thing) s of
+      Just x -> maybe (movePhysical thing) (deflectPhysical thing) x
+      Nothing -> movePhysical thing
 
 pong :: GameState -> GameState
 pong gs = gs {
-    ball = r
+    ball = doPhysical gs.ball [fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls]
   }
-  where
-    things = [
-      fst gs.paddles,
-      snd gs.paddles,
-      fst gs.walls,
-      snd gs.walls
-    ]
-    r = case find isJust $ map (sweepPhysicals gs.ball) things of
-      Just x -> maybe (moveBall gs.ball) (deflectBall gs.ball) x
-      Nothing -> moveBall gs.ball
 
 score :: GameState -> GameState
 score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0
