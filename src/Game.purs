@@ -64,8 +64,8 @@ deflectPhysical ball {time: time, normal: normal} =
 doPhysical :: Physical -> Array Physical -> Physical
 doPhysical thing s =
     case find isJust $ map (sweepPhysicals thing) s of
-      Just x -> maybe (movePhysical thing) (deflectPhysical thing) x
-      Nothing -> movePhysical thing
+      Just (Just x) -> deflectPhysical thing x
+      otherwise -> movePhysical thing
 
 move :: GameState -> GameState
 move gs = gs {
