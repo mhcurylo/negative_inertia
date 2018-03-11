@@ -35,6 +35,13 @@ movePlayer Stay p = p {acc = accStay }
 playerMoves :: PlayerMoves -> GameState -> GameState
 playerMoves pms gs@({paddles}) = gs { paddles = (both movePlayer pms <<*>> paddles) }
 
+movePhysical :: Physical -> Physical
+movePhysical p@{pos, vel, acc} = p {
+    pos = pos + vel
+  , vel = vel + acc
+  , acc = acc
+  }
+
 firstJust :: forall a . Array (Maybe a) -> Maybe a
 firstJust = join <<< head <<< filter isJust 
 
