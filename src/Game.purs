@@ -53,13 +53,13 @@ deflect vel normal = mulV vel (vec nx ny)
     ny = if p (getY normal) then (-1.0) else 1.0
 
 deflectPhysical :: Physical -> Collision -> Physical
-deflectPhysical ball {time: time, normal: normal} =
-  ball {
-    pos = ball.pos + scale time ball.vel + scale (1.0 - time) deflectedVel,
-    vel = deflect ball.vel normal
+deflectPhysical x {time: time, normal: normal} =
+  x {
+    pos = x.pos + scale time x.vel + scale (1.0 - time) deflectedVel,
+    vel = deflect x.vel normal
   }
   where
-    deflectedVel = deflect ball.vel normal
+    deflectedVel = deflect x.vel normal
 
 doPhysical :: Physical -> Array Physical -> Physical
 doPhysical thing s =
