@@ -69,6 +69,8 @@ doPhysical thing s =
       Just (Just x) -> deflectPhysical thing x
       otherwise -> movePhysical thing
 
+-- | Find a pair of indices of earliest colliding elements in array
+-- |
 firstCollision :: Array Physical -> Maybe { collision :: Collision, i :: Int, j :: Int }
 firstCollision v = foldPairs f Nothing (mapWithIndex Tuple v)
   where
