@@ -12,10 +12,10 @@ import Data.Maybe (Maybe(..))
 -- |
 foldPairs :: forall a b. (b -> a -> a -> b) -> b -> Array a -> b
 foldPairs f z s = case uncons s of
-              Just {head: h, tail: t} -> foldPairs f (inner f z h t) t
+              Just {head: h, tail: t} -> foldPairs f (inner z h t) t
               Nothing -> z
   where
-    inner :: forall a b. (b -> a -> a -> b) -> b -> a -> Array a -> b
-    inner f z x s = case uncons s of
-                      Just {head: h, tail: t} -> inner f (f z x h) x t
-                      Nothing -> z
+    inner :: b -> a -> Array a -> b
+    inner zz x ss = case uncons ss of
+                      Just {head: h, tail: t} -> inner (f zz x h) x t
+                      Nothing -> zz

@@ -1,13 +1,15 @@
 module Game (gameLoop, initialGameState) where
 
-import Prelude (map, ($), join, negate, (+), (-), (<), (<<<), (>))
+import Prelude (map, ($), join, negate, (+), (-), (<), (<<<), (>), id, (<$>))
 import Types
 import Math (abs)
 import Data.Maybe (Maybe(..), isJust)
 import Data.Tuple (Tuple(Tuple), fst, snd)
-import Data.Array (filter, find, head)
+import Data.Array (filter, find, head, mapWithIndex)
+import Debug.Trace
 import Control.Biapply ((<<*>>))
 import AABB (Collision, sweepPhysicals)
+import Algorithm (foldPairs)
 
 accBall :: Ball -> Ball
 accBall b = b {vel = vec 4.0 4.8}
@@ -67,6 +69,15 @@ doPhysical thing s =
       Just (Just x) -> deflectPhysical thing x
       otherwise -> movePhysical thing
 
+firstCollision :: Array Physical -> Maybe { collision :: Collision, i :: Int, j :: Int }
+firstCollision v = foldPairs f Nothing (mapWithIndex Tuple v)
+  where
+    f z (Tuple i x) (Tuple j y) = case sweepPhysicals x y of
+      Just collision -> case z of
+        Just zz -> if zz.collision.time < collision.time then z else Just {collision: collision, i: i, j: j}
+        Nothing -> Just {collision: collision, i: i, j: j}
+      Nothing -> z
+
 move :: GameState -> GameState
 move gs = gs {
     ball = doPhysical gs.ball [fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls],
@@ -75,6 +86,7 @@ move gs = gs {
   where
     paddle1 = doPhysical (fst gs.paddles) [fst gs.walls, snd gs.walls]
     paddle2 = doPhysical (snd gs.paddles) [fst gs.walls, snd gs.walls]
+    _ = spy <$> firstCollision [fst gs.walls, snd gs.walls, fst gs.paddles, snd gs.paddles, gs.ball]
 
 score :: GameState -> GameState
 score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0
