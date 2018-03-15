@@ -3,6 +3,7 @@ import Data.Array (uncons)
 import Data.Maybe (Maybe(..))
 
 -- | Applies function to unique pairs of elements of array
+-- | O((n^2)/2)
 -- |
 -- | ```purescript
 -- | foldPairs (\z x y-> z <> "," <> x <> "+" <> y) "_" ["1", "2", "3", "4"]
