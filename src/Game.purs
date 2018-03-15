@@ -3,7 +3,7 @@ module Game (gameLoop, initialGameState) where
 import Prelude (map, ($), join, negate, (+), (-), (<), (<<<), (>))
 import Types
 import Math (abs)
-import Data.Maybe (Maybe(..), isJust, maybe)
+import Data.Maybe (Maybe(..), isJust)
 import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Array (filter, find, head)
 import Control.Biapply ((<<*>>))
