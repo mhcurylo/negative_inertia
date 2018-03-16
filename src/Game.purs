@@ -80,6 +80,9 @@ firstCollision v = foldPairs f Nothing (mapWithIndex Tuple v)
         Nothing -> Just {collision: collision, i: i, j: j}
       Nothing -> z
 
+simulate :: Number -> Array Physical -> Array Physical
+simulate time v = movePhysical 1.0 <$> v
+
 move :: GameState -> GameState
 move gs = gs {
     ball = doPhysical gs.ball [fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls],
