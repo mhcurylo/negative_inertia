@@ -37,10 +37,10 @@ movePlayer Stay p = p {acc = accStay }
 playerMoves :: PlayerMoves -> GameState -> GameState
 playerMoves pms gs@({paddles}) = gs { paddles = (both movePlayer pms <<*>> paddles) }
 
-movePhysical :: Physical -> Physical
-movePhysical p@{pos, vel, acc} = p {
-    pos = pos + vel
-  , vel = vel + acc
+movePhysical :: Number -> Physical -> Physical
+movePhysical time p@{pos, vel, acc} = p {
+    pos = pos + scale time vel
+  , vel = vel + scale time acc
   , acc = acc
   }
 
@@ -67,7 +67,7 @@ doPhysical :: Physical -> Array Physical -> Physical
 doPhysical thing s =
     case find isJust $ map (sweepPhysicals thing) s of
       Just (Just x) -> deflectPhysical thing x
-      otherwise -> movePhysical thing
+      otherwise -> movePhysical 1.0 thing
 
 -- | Find a pair of indices of earliest colliding elements in array
 -- |
