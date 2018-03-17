@@ -63,7 +63,7 @@ instance ringVector :: Ring Vector where
   sub = subV
 
 type Physical = {
-    pos  :: Vector 
+    pos  :: Vector
   , vel  :: Vector
   , acc  :: Vector
   , size :: Vector

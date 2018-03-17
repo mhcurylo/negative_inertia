@@ -1,16 +1,16 @@
 module Game (gameLoop, initialGameState) where
 
-import Prelude (join, negate, (+), (-), (<), (<<<), (>))
+import Prelude (map, ($), join, negate, (+), (-), (<), (<<<), (>))
 import Types
 import Math (abs)
-import Data.Maybe (Maybe, isJust, maybe)
+import Data.Maybe (Maybe(..), isJust, maybe)
 import Data.Tuple (Tuple(Tuple), fst, snd)
-import Data.Array (filter, head)
+import Data.Array (filter, find, head)
 import Control.Biapply ((<<*>>))
 import AABB (Collision, sweepPhysicals)
 
 accBall :: Ball -> Ball
-accBall b = b {vel = vec 2.0 0.0}
+accBall b = b {vel = vec 4.0 4.8}
 
 initialGameState :: GameState
 initialGameState = ({
@@ -35,15 +35,12 @@ movePlayer Stay p = p {acc = accStay }
 playerMoves :: PlayerMoves -> GameState -> GameState
 playerMoves pms gs@({paddles}) = gs { paddles = (both movePlayer pms <<*>> paddles) }
 
-move :: GameState -> GameState
-move gs@{ball, paddles} = gs {ball = ball, paddles = both movePhysical paddles}
- 
-movePhysical :: Physical -> Physical 
+movePhysical :: Physical -> Physical
 movePhysical p@{pos, vel, acc} = p {
     pos = pos + vel
   , vel = vel + acc
-  , acc = acc 
-  } 
+  , acc = acc
+  }
 
 firstJust :: forall a . Array (Maybe a) -> Maybe a
 firstJust = join <<< head <<< filter isJust 
@@ -55,28 +52,29 @@ deflect vel normal = mulV vel (vec nx ny)
     nx = if p (getX normal) then (-1.0) else 1.0
     ny = if p (getY normal) then (-1.0) else 1.0
 
-deflectBall :: Physical -> Collision -> Physical
-deflectBall ball {time: time, normal: normal} =
-  ball {
-    pos = ball.pos + scale time ball.vel + scale (1.0 - time) deflectedVel,
-    vel = deflect ball.vel normal
+deflectPhysical :: Physical -> Collision -> Physical
+deflectPhysical x {time: time, normal: normal} =
+  x {
+    pos = x.pos + scale time x.vel + scale (1.0 - time) deflectedVel,
+    vel = deflect x.vel normal
   }
   where
-    deflectedVel = deflect ball.vel normal
+    deflectedVel = deflect x.vel normal
 
-moveBall :: Physical -> Physical
-moveBall ball = ball {
-    pos = ball.pos + ball.vel
-  }
+doPhysical :: Physical -> Array Physical -> Physical
+doPhysical thing s =
+    case find isJust $ map (sweepPhysicals thing) s of
+      Just (Just x) -> deflectPhysical thing x
+      otherwise -> movePhysical thing
 
-pong :: GameState -> GameState
-pong gs = gs {
-    ball = r
+move :: GameState -> GameState
+move gs = gs {
+    ball = doPhysical gs.ball [fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls],
+    paddles = Tuple paddle1 paddle2
   }
   where
-    col1 = sweepPhysicals gs.ball (fst gs.paddles)
-    col2 = sweepPhysicals gs.ball (snd gs.paddles)
-    r = maybe (maybe (moveBall gs.ball) (deflectBall gs.ball) col2) (deflectBall gs.ball) col1
+    paddle1 = doPhysical (fst gs.paddles) [fst gs.walls, snd gs.walls]
+    paddle2 = doPhysical (snd gs.paddles) [fst gs.walls, snd gs.walls]
 
 score :: GameState -> GameState
 score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0
@@ -88,4 +86,4 @@ score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0
   bx = getX ball.pos      
 
 gameLoop :: PlayerMoves -> GameState -> GameState
-gameLoop pm = score <<< pong <<< move <<< playerMoves pm
+gameLoop pm = score <<< move <<< playerMoves pm

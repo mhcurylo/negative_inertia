@@ -2,7 +2,7 @@ module AABB(AABB, fromPhysical, sweepAABB, Collision, sweepPhysicals) where
 
 import Prelude ((||), (&&), (>=), (<=), (>), (<), (-), (+), (/), (==), otherwise, negate)
 import Data.Number (infinity)
-import Math (max)
+import Math (max, min)
 import Types (Physical, Vector, getX, getY, vec)
 import Data.Maybe (Maybe(..))
 
@@ -66,7 +66,7 @@ sweepAABB v a b = r
     yEntry = if vy == 0.0 then -infinity else yInvEntry / vy
     yExit = if vy == 0.0 then infinity else yInvExit / vy
     entryTime = max xEntry yEntry
-    exitTime = max xExit yExit
+    exitTime = min xExit yExit
     nx = if xInvEntry < 0.0 then 1.0 else -1.0
     ny = if yInvEntry < 0.0 then 1.0 else -1.0
     normal = if xEntry > yEntry then vec nx 0.0 else if xEntry < yEntry then vec 0.0 ny else vec nx ny
