@@ -21,9 +21,9 @@ initialGameState = ({
 })
 
 accUp :: Vector
-accUp = vec 0.0 (-1.0)
+accUp = vec 0.0 (-1.2)
 accDown :: Vector
-accDown = vec 0.0 1.0
+accDown = vec 0.0 1.2
 accStay :: Vector
 accStay = zeroVector  
 
@@ -61,11 +61,19 @@ deflectPhysical x {time: time, normal: normal} =
   where
     deflectedVel = deflect x.vel normal
 
+applyInertia :: Physical -> Physical
+applyInertia t@({inertia, vel}) = t {
+    vel = mulV inertia vel
+  }
+
 doPhysical :: Physical -> Array Physical -> Physical
 doPhysical thing s =
-    case find isJust $ map (sweepPhysicals thing) s of
-      Just (Just x) -> deflectPhysical thing x
-      otherwise -> movePhysical thing
+    case find isJust $ map (sweepPhysicals thing') s of
+      Just (Just x) -> deflectPhysical thing' x
+      otherwise -> movePhysical thing'
+    where
+    thing' = applyInertia thing      
+
 
 move :: GameState -> GameState
 move gs = gs {
