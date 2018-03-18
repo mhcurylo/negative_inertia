@@ -1,12 +1,14 @@
 module Game (gameLoop, initialGameState) where
 
-import Prelude (join, negate, (+), (<), (<<<), (>))
+import Prelude (join, negate, (+), (<), (<<<), (>), (<$>), (||), ($))
 import Types
 import Data.Maybe (Maybe, isJust)
 import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Array (filter, head)
 import Control.Biapply ((<<*>>))
 import Physics (simulate)
+
+
 
 accBall :: Ball -> Ball
 accBall b = b {vel = vec 4.0 4.8}
@@ -19,10 +21,11 @@ initialGameState = ({
   , walls: Tuple (createWall 35.0) (createWall 590.0)
 })
 
+
 accUp :: Vector
-accUp = vec 0.0 (-1.0)
+accUp = vec 0.0 (-1.2)
 accDown :: Vector
-accDown = vec 0.0 1.0
+accDown = vec 0.0 1.2
 accStay :: Vector
 accStay = zeroVector  
 
@@ -37,6 +40,11 @@ playerMoves pms gs@({paddles}) = gs { paddles = (both movePlayer pms <<*>> paddl
 firstJust :: forall a . Array (Maybe a) -> Maybe a
 firstJust = join <<< head <<< filter isJust 
 
+applyInertia :: Physical -> Physical
+applyInertia t@({inertia, vel}) = t {
+    vel = mulV inertia vel
+  }
+
 move :: GameState -> GameState
 move gs = case ret of
     [b, p1, p2, w1, w2] -> gs {
@@ -46,16 +54,26 @@ move gs = case ret of
     }
     otherwise -> gs
   where
-    ret = simulate 1.0 [gs.ball, fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls]
+    ret = applyInertia <$> simulate 1.0 [gs.ball, fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls]
 
 score :: GameState -> GameState
 score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0
   then initialGameState {scores = Tuple p1 (p2 + 1)}
   else if bx > 1000.0
     then initialGameState {scores = Tuple (p1 + 1) p2}
-    else gs
+    else gs 
   where
   bx = getX ball.pos      
 
-gameLoop :: PlayerMoves -> GameState -> GameState
-gameLoop pm = score <<< move <<< playerMoves pm
+finish :: GameState -> Game
+finish gs@({scores: (Tuple p1 p2)}) = if (p1 > 9) || (p2 > 9)
+  then Finish p1 p2
+  else Progress gs
+
+resetIfMoved :: PlayerMoves -> Game -> Game
+resetIfMoved (Tuple Stay Stay) g = g
+resetIfMoved _ g = Progress initialGameState   
+
+gameLoop :: PlayerMoves -> Game -> Game
+gameLoop pm (Progress gameState) = finish <<< score <<< move <<< playerMoves pm $ gameState
+gameLoop pm g = resetIfMoved pm g 

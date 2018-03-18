@@ -67,6 +67,7 @@ type Physical = {
   , vel  :: Vector
   , acc  :: Vector
   , size :: Vector
+  , inertia :: Vector
 }
 
 showPhysical :: Physical -> String
@@ -93,22 +94,27 @@ type GameState = {
     , scores :: Scores
 }
 
-createPhysical :: Number -> Number -> Number -> Number -> Physical
-createPhysical w h x y = ({
+data Game = Start
+  | Progress GameState
+  | Finish Int Int 
+
+createPhysical :: Number -> Number -> Number -> Number -> Number -> Number -> Physical
+createPhysical ix iy w h x y = ({
     pos: vec x y
   , acc: zeroVector
   , vel: zeroVector
   , size: vec w h
+  , inertia: vec ix iy
 }) 
 
 createBox :: Number -> Number -> Number -> Number -> Physical
-createBox = createPhysical
+createBox = createPhysical 0.0 0.0
 
 createPaddle :: Number -> Number -> Paddle
-createPaddle = createPhysical 20.0 70.0
+createPaddle = createPhysical 0.0 0.95 20.0 70.0
 
 createBall :: Number -> Number -> Ball
-createBall = createPhysical 15.0 15.0
+createBall = createPhysical 1.001 1.001 15.0 15.0
 
 createWall :: Number -> Wall
 createWall = createBox 960.0 5.0 20.0
