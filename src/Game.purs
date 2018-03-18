@@ -5,11 +5,11 @@ import Types
 import Math (abs)
 import Data.Maybe (Maybe(..), isJust, maybe)
 import Data.Tuple (Tuple(Tuple), fst, snd)
-import Data.Array (filter, find, head, mapWithIndex)
+import Data.Array (filter, find, head, mapWithIndex, index)
 import Debug.Trace
 import Control.Biapply ((<<*>>))
 import AABB (Collision, sweepPhysicals)
-import Algorithm (foldPairs)
+import Algorithm (foldPairs, listTuple)
 
 accBall :: Ball -> Ball
 accBall b = b {vel = vec 4.0 4.8}
@@ -80,8 +80,8 @@ firstCollision v = foldPairs f Nothing (mapWithIndex Tuple v)
         Nothing -> Just {collision: collision, i: i, j: j}
       Nothing -> z
 
-collide :: Physical -> Physical -> Collision -> Tuple Physical Physical
-collide a b {time, normal} = Tuple a b
+collide :: Collision -> Physical -> Physical -> Tuple Physical Physical
+collide {time, normal} a b = Tuple a b
 
 simulate :: Number -> Array Physical -> Array Physical
 simulate time v =
@@ -89,7 +89,9 @@ simulate time v =
     Just {collision, i, j} ->
       if collision.time >= time
       then justMove
-      else justMove
+      else case {a: index v i, b: index v j} of
+              {a: Just aa, b: Just bb} -> listTuple $ collide collision aa bb
+              otherwise -> justMove
     Nothing -> justMove
   where
     justMove = movePhysical time <$> v
