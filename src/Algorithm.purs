@@ -8,7 +8,7 @@ import Data.Tuple (Tuple(..))
 -- |
 -- | ```purescript
 -- | foldPairs (\z x y-> z <> "," <> x <> "+" <> y) "_" ["1", "2", "3", "4"]
--- |    = "_,1+2,1+3,1+4,2+3,2+4,3+4" 
+-- |    = "_,1+2,1+3,1+4,2+3,2+4,3+4"
 -- | ```
 -- |
 foldPairs :: forall a b. (b -> a -> a -> b) -> b -> Array a -> b
