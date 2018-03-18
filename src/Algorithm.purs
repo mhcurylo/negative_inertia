@@ -4,7 +4,8 @@ import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 
 -- | Applies function to unique pairs of elements of array
--- | O((n^2)/2)
+-- | Complexity O((n^2)/2)
+-- | Tail call optimisable
 -- |
 -- | ```purescript
 -- | foldPairs (\z x y-> z <> "," <> x <> "+" <> y) "_" ["1", "2", "3", "4"]
