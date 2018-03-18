@@ -1,9 +1,9 @@
 module Game (gameLoop, initialGameState) where
 
-import Prelude (map, ($), join, negate, (+), (-), (<), (<<<), (>), id, (<$>))
+import Prelude (map, ($), join, negate, (+), (-), (<), (<<<), (>), (>=), id, (<$>))
 import Types
 import Math (abs)
-import Data.Maybe (Maybe(..), isJust)
+import Data.Maybe (Maybe(..), isJust, maybe)
 import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Array (filter, find, head, mapWithIndex)
 import Debug.Trace
@@ -80,8 +80,17 @@ firstCollision v = foldPairs f Nothing (mapWithIndex Tuple v)
         Nothing -> Just {collision: collision, i: i, j: j}
       Nothing -> z
 
+collide :: Physical -> Physical -> Collision -> Tuple Physical Physical
+collide a b {time, normal} = Tuple a b
+
 simulate :: Number -> Array Physical -> Array Physical
-simulate time v = movePhysical 1.0 <$> v
+simulate time v =
+  case firstCollision v of
+    Just {collision, i, j} ->
+      if collision.time >= time then justMove else justMove
+    Nothing -> justMove
+  where
+    justMove = movePhysical time <$> v
 
 move :: GameState -> GameState
 move gs = gs {
