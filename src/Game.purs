@@ -3,9 +3,9 @@ module Game (gameLoop, initialGameState) where
 import Prelude (map, ($), join, negate, (+), (-), (<), (<<<), (>), (>=), id, (<$>))
 import Types
 import Math (abs)
-import Data.Maybe (Maybe(..), isJust, maybe)
+import Data.Maybe (Maybe(..), isJust, maybe, fromMaybe)
 import Data.Tuple (Tuple(Tuple), fst, snd)
-import Data.Array (filter, find, head, mapWithIndex, index)
+import Data.Array (filter, find, head, mapWithIndex, index, modifyAt)
 import Debug.Trace
 import Control.Biapply ((<<*>>))
 import AABB (Collision, sweepPhysicals)
@@ -76,12 +76,17 @@ firstCollision v = foldPairs f Nothing (mapWithIndex Tuple v)
   where
     f z (Tuple i x) (Tuple j y) = case sweepPhysicals x y of
       Just collision -> case z of
-        Just zz -> if zz.collision.time < collision.time then z else Just {collision: collision, i: i, j: j}
+        Just zz -> if zz.collision.time < collision.time
+                   then z
+                   else Just {collision: collision, i: i, j: j}
         Nothing -> Just {collision: collision, i: i, j: j}
       Nothing -> z
 
-collide :: Collision -> Physical -> Physical -> Tuple Physical Physical
-collide {time, normal} a b = Tuple a b
+deflectPhysical2 :: Collision -> Physical -> Physical
+deflectPhysical2 {normal} x = x { vel = deflect x.vel normal }
+
+opposite :: Collision -> Collision
+opposite x@{normal} = x {normal = mulV (vec (-1.0) (-1.0)) normal}
 
 simulate :: Number -> Array Physical -> Array Physical
 simulate time v =
@@ -89,12 +94,23 @@ simulate time v =
     Just {collision, i, j} ->
       if collision.time >= time
       then justMove
-      else case {a: index v i, b: index v j} of
-              {a: Just aa, b: Just bb} -> listTuple $ collide collision aa bb
-              otherwise -> justMove
+      else simulate (time - collision.time) (u2 collision i j (movePhysical collision.time <$> v))
     Nothing -> justMove
   where
     justMove = movePhysical time <$> v
+    u c i v = fromMaybe v (modifyAt i (deflectPhysical2 c) v)
+    u2 c i j v = u (opposite c) j $ u c i v
+
+move2 :: GameState -> GameState
+move2 gs = case ret of
+    [b, p1, p2, w1, w2] -> gs {
+      ball = b,
+      paddles = Tuple p1 p2,
+      walls = Tuple w1 w2
+    }
+    otherwise -> gs
+  where
+    ret = simulate 1.0 [gs.ball, fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls]
 
 move :: GameState -> GameState
 move gs = gs {
@@ -116,4 +132,4 @@ score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0
   bx = getX ball.pos      
 
 gameLoop :: PlayerMoves -> GameState -> GameState
-gameLoop pm = score <<< move <<< playerMoves pm
+gameLoop pm = score <<< move2 <<< playerMoves pm
