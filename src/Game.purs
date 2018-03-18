@@ -1,15 +1,11 @@
 module Game (gameLoop, initialGameState) where
 
-import Prelude (map, ($), join, negate, (+), (-), (<), (<<<), (>), (>=), id, (<$>))
+import Prelude (join, negate, (+), (<), (<<<), (>))
 import Types
-import Math (abs)
-import Data.Maybe (Maybe(..), isJust, maybe, fromMaybe)
+import Data.Maybe (Maybe, isJust)
 import Data.Tuple (Tuple(Tuple), fst, snd)
-import Data.Array (filter, find, head, mapWithIndex, index, modifyAt)
-import Debug.Trace
+import Data.Array (filter, head)
 import Control.Biapply ((<<*>>))
-import AABB (Collision, sweepPhysicals)
-import Algorithm (foldPairs, listTuple)
 import Physics (simulate)
 
 accBall :: Ball -> Ball

@@ -2,8 +2,8 @@ module Physics(simulate) where
 import Prelude ((<$>), ($), (>), (<), (>=), (-), (+), negate)
 import Math(abs)
 import AABB (Collision, sweepPhysicals)
-import Algorithm (foldPairs, listTuple)
-import Types(Vector(Vector), Physical, mulV, getX, getY, vec, scale)
+import Algorithm (foldPairs)
+import Types(Vector, Physical, mulV, getX, getY, vec, scale)
 import Data.Array (modifyAt, mapWithIndex)
 import Data.Tuple (Tuple(Tuple))
 import Data.Maybe (Maybe(..), fromMaybe)
@@ -53,5 +53,5 @@ simulate time v =
     Nothing -> justMove
   where
     justMove = movePhysical time <$> v
-    u c i v = fromMaybe v (modifyAt i (deflectPhysical c) v)
-    u2 c i j v = u (opposite c) j $ u c i v
+    u c i w = fromMaybe w (modifyAt i (deflectPhysical c) w)
+    u2 c i j w = u (opposite c) j $ u c i w
