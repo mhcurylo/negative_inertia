@@ -1,6 +1,7 @@
-module Algorithm (foldPairs) where
+module Algorithm (foldPairs, listTuple) where
 import Data.Array (uncons)
 import Data.Maybe (Maybe(..))
+import Data.Tuple (Tuple(..))
 
 -- | Applies function to unique pairs of elements of array
 -- | O((n^2)/2)
@@ -19,3 +20,12 @@ foldPairs f z s = case uncons s of
     inner zz x ss = case uncons ss of
                       Just {head: h, tail: t} -> inner (f zz x h) x t
                       Nothing -> zz
+
+-- | Returns an array of elements of homogenous tuple
+-- |
+-- | ```purescript
+-- | listTuple (Tuple 1 2) = [1, 2]
+-- | ```
+-- |
+listTuple :: forall a . Tuple a a -> Array a
+listTuple (Tuple x y) = [x, y]

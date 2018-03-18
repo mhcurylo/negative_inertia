@@ -5,6 +5,7 @@ import Graphics.Drawing.Font (font, sansSerif, bold, Font)
 import Graphics.Drawing (Drawing, black, fillColor, filled, rectangle, text, white)
 import Data.Tuple (Tuple(Tuple))
 import Data.Foldable (foldMap)
+import Algorithm (listTuple)
 
 import Types 
 
@@ -16,9 +17,6 @@ drawSquare ({pos, size}) = filled (fillColor white) (rectangle (getX pos) (getY 
 
 drawScores :: Scores -> Drawing
 drawScores (Tuple p1 p2) = text scoreFont 490.0 25.0 (fillColor white) (show p1 <> " : " <> show p2) 
-
-listTuple :: forall a . Tuple a a -> Array a
-listTuple (Tuple x y) = [x, y]
 
 drawGameState :: GameState -> Drawing
 drawGameState ({ball, paddles, scores, walls})  = filled (fillColor black) (rectangle 0.0 0.0 1000.0 6000.0) 

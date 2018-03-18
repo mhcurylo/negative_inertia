@@ -87,7 +87,9 @@ simulate :: Number -> Array Physical -> Array Physical
 simulate time v =
   case firstCollision v of
     Just {collision, i, j} ->
-      if collision.time >= time then justMove else justMove
+      if collision.time >= time
+      then justMove
+      else justMove
     Nothing -> justMove
   where
     justMove = movePhysical time <$> v
