@@ -38,10 +38,10 @@ movePlayer Stay p = p {acc = accStay }
 playerMoves :: PlayerMoves -> GameState -> GameState
 playerMoves pms gs@({paddles}) = gs { paddles = (both movePlayer pms <<*>> paddles) }
 
-movePhysical :: Physical -> Physical
-movePhysical p@{pos, vel, acc} = p {
-    pos = pos + vel
-  , vel = vel + acc
+movePhysical :: Number -> Physical -> Physical
+movePhysical time p@{pos, vel, acc} = p {
+    pos = pos + scale time vel
+  , vel = vel + scale time acc
   , acc = acc
   }
 
@@ -55,14 +55,15 @@ deflect vel normal = mulV vel (vec nx ny)
     nx = if p (getX normal) then (-1.0) else 1.0
     ny = if p (getY normal) then (-1.0) else 1.0
 
+-- | Applies collision response
+-- | 1. Move physical to the collision point in time
+-- | 2. Set physical's velocity to that after collision
+-- | 3. Move physical to the point after collision
+-- |
 deflectPhysical :: Physical -> Collision -> Physical
 deflectPhysical x {time: time, normal: normal} =
-  x {
-    pos = x.pos + scale time x.vel + scale (1.0 - time) deflectedVel,
-    vel = deflect x.vel normal
-  }
-  where
-    deflectedVel = deflect x.vel normal
+  movePhysical (1.0 - time)
+    ((movePhysical time x) { vel = deflect x.vel normal })
 
 applyInertia :: Physical -> Physical
 applyInertia t@({inertia, vel}) = t {
@@ -73,7 +74,7 @@ doPhysical :: Physical -> Array Physical -> Physical
 doPhysical thing s =
     case find isJust $ map (sweepPhysicals thing') s of
       Just (Just x) -> deflectPhysical thing' x
-      otherwise -> movePhysical thing'
+      otherwise -> movePhysical 1.0 thing'
     where
     thing' = applyInertia thing      
 
