@@ -12,7 +12,7 @@ import AABB (Collision, sweepPhysicals)
 
 
 accBall :: Ball -> Ball
-accBall b = b {vel = vec 4.0 4.8}
+accBall b = b {vel = vec (-4.0) 0.0}
 
 initialGameState :: GameState
 initialGameState = ({
@@ -77,7 +77,6 @@ doPhysical thing s =
       otherwise -> movePhysical 1.0 thing'
     where
     thing' = applyInertia thing      
-
 
 move :: GameState -> GameState
 move gs = gs {
