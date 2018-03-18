@@ -23,8 +23,8 @@ firstCollision v = foldPairs f Nothing (mapWithIndex Tuple v)
       Just collision -> case z of
         Just zz -> if zz.collision.time < collision.time
                    then z
-                   else Just {collision: collision, i: i, j: j}
-        Nothing -> Just {collision: collision, i: i, j: j}
+                   else Just {collision, i, j}
+        Nothing -> Just {collision, i, j}
       Nothing -> z
 
 deflect :: Vector -> Vector -> Vector
@@ -51,9 +51,14 @@ simulate time v =
     Just {collision, i, j} ->
       if collision.time >= time
       then justMove
-      else simulate (time - collision.time) (u2 collision i j (movePhysical collision.time <$> v))
+      else
+        let
+          moved = movePhysical collision.time <$> v
+          next v = simulate (time - collision.time) v
+        in
+          next moved
     Nothing -> justMove
   where
     justMove = movePhysical time <$> v
     u c i w = fromMaybe w (modifyAt i (deflectPhysical c) w)
-    u2 c i j w = u (opposite c) j $ u c i w
+    u2 c i j w = u (opposite c) i $ u c j w
