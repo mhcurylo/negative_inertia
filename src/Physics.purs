@@ -43,7 +43,6 @@ opposite :: Collision -> Collision
 opposite x@{normal} = x {normal = mulV (vec (-1.0) (-1.0)) normal}
 
 -- | Simulate an array of physicals over time
--- | Tail call optimisable
 -- | Recurses for as long as there are collisions
 simulate :: Number -> Array Physical -> Array Physical
 simulate time v =
@@ -51,7 +50,7 @@ simulate time v =
     Just {collision, i, j} ->
       if collision.time >= time
       then justMove
-      else
+      else 
         let
           moved = movePhysical collision.time <$> v
           next v = simulate (time - collision.time) v
