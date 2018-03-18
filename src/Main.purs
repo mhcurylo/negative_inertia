@@ -12,6 +12,7 @@ import Graphics.Canvas (CANVAS, getCanvasElementById, getContext2D)
 import Partial.Unsafe (unsafePartial)
 import GameEngine (animateGame)
 import Game (gameLoop, initialGameState)
+import Types (Game(Start))
 import Draw (drawGameState)
 import Input (input)
 
@@ -23,7 +24,7 @@ game = do
   mc <- getCanvasElementById "canvas"
   let canvas = unsafePartial (fromJust mc)
   ctx <- getContext2D canvas
-  _ <- animateGame input gameLoop initialGameState (render ctx <<< drawGameState)
+  _ <- animateGame input gameLoop Start (render ctx <<< drawGameState)
   pure unit
 
 main :: Unit

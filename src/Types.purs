@@ -94,6 +94,10 @@ type GameState = {
     , scores :: Scores
 }
 
+data Game = Start
+  | Progress GameState
+  | Finish Int Int 
+
 createPhysical :: Number -> Number -> Number -> Number -> Number -> Number -> Physical
 createPhysical ix iy w h x y = ({
     pos: vec x y
