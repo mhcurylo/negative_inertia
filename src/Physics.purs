@@ -3,7 +3,7 @@ import Prelude ((<$>), ($), (>), (<), (>=), (-), (+), negate)
 import Math(abs)
 import AABB (Collision, sweepPhysicals)
 import Algorithm (foldPairs)
-import Types(Vector, Physical, mulV, getX, getY, vec, scale)
+import Types(Vector, Physical, mulV, getX, getY, vec, scale, oneVector)
 import Data.Array (modifyAt, mapWithIndex)
 import Data.Tuple (Tuple(Tuple))
 import Data.Maybe (Maybe(..), fromMaybe)
@@ -39,8 +39,8 @@ deflectPhysical :: Collision -> Physical -> Physical
 deflectPhysical {normal} x = x { vel = deflect x.vel normal }
 
 -- | Return a collision with opposite normal
-opposite :: Collision -> Collision
-opposite x@{normal} = x {normal = mulV (vec (-1.0) (-1.0)) normal}
+opposite :: Vector -> Vector
+opposite = mulV (scale (-1.0) oneVector)
 
 -- | Simulate an array of physicals over time
 -- | Recurses for as long as there are collisions
@@ -55,4 +55,4 @@ simulate time v =
   where
     justMove = movePhysical time <$> v
     u c i w = fromMaybe w (modifyAt i (deflectPhysical c) w)
-    u2 c i j w = u (opposite c) i $ u c j w
+    u2 c i j w = u (c {normal = opposite c.normal}) i $ u c j w
