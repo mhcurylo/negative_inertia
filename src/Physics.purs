@@ -1,9 +1,9 @@
 module Physics(simulate) where
-import Prelude ((<$>), ($), (>), (<), (>=), (-), (+), negate)
+import Prelude ((<$>), ($), (>), (<), (>=), (-), (+), negate, (*))
 import Math(abs)
 import AABB (Collision, sweepPhysicals)
 import Algorithm (foldPairs)
-import Types(Vector, Physical, mulV, getX, getY, vec, scale, oneVector)
+import Types(Vector, Physical, getX, getY, vec, scale, oneVector)
 import Data.Array (modifyAt, mapWithIndex)
 import Data.Tuple (Tuple(Tuple))
 import Data.Maybe (Maybe(..), fromMaybe)
@@ -28,7 +28,7 @@ firstCollision v = foldPairs f Nothing (mapWithIndex Tuple v)
       Nothing -> z
 
 deflect :: Vector -> Vector -> Vector
-deflect vel normal = mulV vel (vec nx ny) 
+deflect vel normal = vel * vec nx ny
   where
     p x = abs x > 0.0
     nx = if p (getX normal) then (-1.0) else 1.0
@@ -40,7 +40,7 @@ deflectPhysical {normal} x = x { vel = deflect x.vel normal }
 
 -- | Return a collision with opposite normal
 opposite :: Vector -> Vector
-opposite = mulV (scale (-1.0) oneVector)
+opposite = (*) (scale (-1.0) oneVector)
 
 -- | Simulate an array of physicals over time
 -- | Recurses for as long as there are collisions
