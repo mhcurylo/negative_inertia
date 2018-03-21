@@ -37,8 +37,8 @@ testAABB = do
     qc Nothing (sweepAABB (vec 0.0 0.0) (fromRect 0.0 0.0 1.0 1.0) (fromRect 1.0 0.0 1.0 1.0))
     qc (Just {time: 0.25, normal: vec (-1.0) 0.0})    (sweepAABB (vec 4.0 0.0)       (fromRect 0.0 0.0 1.0 1.0) (fromRect 2.0 0.0 1.0 1.0))
     qc (Just {time: 0.25, normal: vec 0.0 (-1.0)})    (sweepAABB (vec 0.0 4.0)       (fromRect 0.0 0.0 1.0 1.0) (fromRect 0.0 2.0 1.0 1.0))
-    qc (Just {time: 1.00, normal: vec 1.0 0.0})       (sweepAABB (vec (-1.0) 0.0)    (fromRect 2.0 2.0 1.0 1.0) (fromRect 0.0 0.0 1.0 1.0))
-    qc (Just {time: 1.00, normal: vec 0.0 1.0})       (sweepAABB (vec 0.0 (-1.0))    (fromRect 2.0 2.0 1.0 1.0) (fromRect 0.0 0.0 1.0 1.0))
+    qc Nothing                                        (sweepAABB (vec (-1.0) 0.0)    (fromRect 2.0 2.0 1.0 1.0) (fromRect 0.0 0.0 1.0 1.0))
+    qc Nothing                                        (sweepAABB (vec 0.0 (-1.0))    (fromRect 2.0 2.0 1.0 1.0) (fromRect 0.0 0.0 1.0 1.0))
     qc (Just {time: 0.50, normal: vec (-1.0) (-1.0)}) (sweepAABB (vec 2.0 2.0)       (fromRect 0.0 0.0 1.0 1.0) (fromRect 2.0 2.0 1.0 1.0))
     qc (Just {time: 0.50, normal: vec (1.0) (1.0)})   (sweepAABB (vec (-2.0) (-2.0)) (fromRect 2.0 2.0 1.0 1.0) (fromRect 0.0 0.0 1.0 1.0))
     -- Fails with max being used in exitTime instead of min
