@@ -50,12 +50,7 @@ simulate time v =
     Just {collision, i, j} ->
       if collision.time >= time
       then justMove
-      else 
-        let
-          moved = movePhysical collision.time <$> v
-          next v = simulate (time - collision.time) v
-        in
-          next moved
+      else simulate (time - collision.time) (u2 collision i j (movePhysical collision.time <$> v))
     Nothing -> justMove
   where
     justMove = movePhysical time <$> v
