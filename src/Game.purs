@@ -15,10 +15,10 @@ accBall b = b {vel = vec 0.0 0.0}
 
 initialGameState :: GameState
 initialGameState = ({
-    ball: accBall (createBall "ball" 495.0 300.0)
-  , paddles: Tuple (createPaddle "paddle1" 30.0 280.0) (createPaddle "paddle2" 960.0 280.0)
+    ball: accBall (createBall 495.0 300.0)
+  , paddles: Tuple (createPaddle 30.0 280.0) (createPaddle 960.0 280.0)
   , scores: Tuple 0 0
-  , walls: Tuple (createWall "wall1" 35.0) (createWall "wall2" 590.0)
+  , walls: Tuple (createWall 35.0) (createWall 590.0)
 })
 
 
