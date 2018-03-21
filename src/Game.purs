@@ -11,7 +11,7 @@ import Physics (simulate)
 
 
 accBall :: Ball -> Ball
-accBall b = b {vel = vec 0.0 0.0}
+accBall b = b {vel = vec 4.0 4.8}
 
 initialGameState :: GameState
 initialGameState = ({
