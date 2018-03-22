@@ -3,8 +3,8 @@ import Prelude ((<$>), ($), (>), (<), (>=), (-), (+), negate, (*))
 import Math(abs)
 import AABB (Collision, sweepPhysicals)
 import Algorithm (foldPairs)
-import Types(Vector, Physical, getX, getY, vec, scale, oneVector)
-import Data.Array (modifyAt, mapWithIndex)
+import Types(Vector, Physical, getX, getY, vec, scale, oneVector, both)
+import Data.Array (modifyAt, updateAt, mapWithIndex, index)
 import Data.Tuple (Tuple(Tuple))
 import Data.Maybe (Maybe(..), fromMaybe)
 
@@ -38,6 +38,22 @@ deflect vel normal = vel * vec nx ny
 deflectPhysical :: Collision -> Physical -> Physical
 deflectPhysical {normal} x = x { vel = deflect x.vel normal }
 
+collide :: Collision -> Physical -> Physical -> Tuple Physical Physical
+collide collision a b = both (deflectPhysical collision) $ Tuple a b
+
+unsafeUpdateAt :: forall a. Int -> a -> Array a -> Array a
+unsafeUpdateAt i x v = fromMaybe v (updateAt i x v)
+
+unsafeUpdateBothAt :: forall a. (a -> a -> Tuple a a) -> Int -> Int -> Array a -> Array a
+unsafeUpdateBothAt f i j v =
+  case {x: index v i, y: index v j} of
+    {x: Just x, y: Just y} ->
+        let
+          Tuple x' y' = f x y
+        in
+          unsafeUpdateAt j y' (unsafeUpdateAt i x' v)
+    otherwise -> v
+
 -- | Return a collision with opposite normal
 opposite :: Vector -> Vector
 opposite = (*) (scale (-1.0) oneVector)
@@ -50,9 +66,8 @@ simulate time v =
     Just {collision, i, j} ->
       if collision.time >= time
       then justMove
-      else simulate (time - collision.time) (u2 collision i j (movePhysical collision.time <$> v))
+      else simulate (time - collision.time)
+                    (unsafeUpdateBothAt (collide collision) i j (movePhysical collision.time <$> v))
     Nothing -> justMove
   where
     justMove = movePhysical time <$> v
-    u c i w = fromMaybe w (modifyAt i (deflectPhysical c) w)
-    u2 c i j w = u (c {normal = opposite c.normal}) i $ u c j w
