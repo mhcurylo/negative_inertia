@@ -39,7 +39,10 @@ deflectPhysical :: Collision -> Physical -> Physical
 deflectPhysical {normal} x = x { vel = deflect x.vel normal }
 
 collide :: Collision -> Physical -> Physical -> Tuple Physical Physical
-collide collision a b = both (deflectPhysical collision) $ Tuple a b
+collide collision@{normal} a b = Tuple a' b'
+  where
+    a' = deflectPhysical collision a
+    b' = deflectPhysical collision {normal = opposite normal} b
 
 unsafeUpdateAt :: forall a. Int -> a -> Array a -> Array a
 unsafeUpdateAt i x v = fromMaybe v (updateAt i x v)
