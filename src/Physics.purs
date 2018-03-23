@@ -1,12 +1,13 @@
 module Physics(simulate) where
 import Prelude ((<$>), ($), (>), (<), (>=), (-), (+), negate, (*))
-import Math(abs)
+import Math (abs)
 import AABB (Collision, sweepPhysicals)
 import Algorithm (foldPairs)
 import Types(Vector, Physical, getX, getY, vec, scale, oneVector, both)
 import Data.Array (modifyAt, updateAt, mapWithIndex, index)
 import Data.Tuple (Tuple(Tuple))
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(..), fromMaybe, fromJust)
+import Partial.Unsafe (unsafePartial)
 
 movePhysical :: Number -> Physical -> Physical
 movePhysical time p@{pos, vel, acc} = p {
@@ -41,18 +42,18 @@ deflectPhysical {normal} x = x { vel = deflect x.vel normal }
 collide :: Collision -> Physical -> Physical -> Tuple Physical Physical
 collide collision a b = both (deflectPhysical collision) $ Tuple a b
 
+unsafeIndex :: forall a. Array a -> Int -> a
+unsafeIndex v i = unsafePartial $ fromJust $ index v i
+
 unsafeUpdateAt :: forall a. Int -> a -> Array a -> Array a
-unsafeUpdateAt i x v = fromMaybe v (updateAt i x v)
+unsafeUpdateAt i x v = unsafePartial $ fromJust $ updateAt i x v
 
 unsafeUpdateBothAt :: forall a. (a -> a -> Tuple a a) -> Int -> Int -> Array a -> Array a
 unsafeUpdateBothAt f i j v =
-  case {x: index v i, y: index v j} of
-    {x: Just x, y: Just y} ->
-        let
-          Tuple x' y' = f x y
-        in
-          unsafeUpdateAt j y' (unsafeUpdateAt i x' v)
-    otherwise -> v
+  let
+    Tuple x' y' = f (unsafeIndex v i) (unsafeIndex v j)
+  in
+    unsafeUpdateAt j y' (unsafeUpdateAt i x' v)
 
 -- | Return a collision with opposite normal
 opposite :: Vector -> Vector
