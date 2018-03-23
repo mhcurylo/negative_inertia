@@ -40,7 +40,10 @@ deflectPhysical :: Collision -> Physical -> Physical
 deflectPhysical {normal} x = x { vel = deflect x.vel normal }
 
 collide :: Collision -> Physical -> Physical -> Tuple Physical Physical
-collide collision a b = both (deflectPhysical collision) $ Tuple a b
+collide collision@{normal} a b = Tuple a' b'
+  where
+    a' = deflectPhysical collision a
+    b' = deflectPhysical collision {normal = opposite normal} b
 
 unsafeIndex :: forall a. Array a -> Int -> a
 unsafeIndex v i = unsafePartial $ fromJust $ index v i
