@@ -1,9 +1,9 @@
 module Physics(simulate) where
 import Prelude ((<$>), ($), (>), (<), (>=), (-), (+), negate, (*))
-import Math (abs)
+import Math (abs, max)
 import AABB (Collision, sweepPhysicals)
 import Algorithm (foldPairs)
-import Types(Vector, Physical, getX, getY, vec, scale, oneVector, both)
+import Types(Vector, Physical, getX, getY, vec, scale, oneVector, both, dot)
 import Data.Array (modifyAt, updateAt, mapWithIndex, index)
 import Data.Tuple (Tuple(Tuple))
 import Data.Maybe (Maybe(..), fromMaybe, fromJust)
@@ -35,9 +35,17 @@ deflect vel normal = vel * vec nx ny
     nx = if p (getX normal) then (-1.0) else 1.0
     ny = if p (getY normal) then (-1.0) else 1.0
 
--- | Return a physical with reflected velocity for collision
+-- | Apply collision impulse
+-- |
+-- | Reference https://gafferongames.com/post/collision_response_and_coulomb_friction/
 deflectPhysical :: Collision -> Physical -> Physical
-deflectPhysical {normal} x = x { vel = deflect x.vel normal }
+deflectPhysical {normal} x@{vel} =
+  let
+    restitution = 1.0
+    d = dot vel normal
+    j = max (-(1.0 + restitution) * d) 0.0
+  in
+    x { vel = vel + scale j normal }
 
 collide :: Collision -> Physical -> Physical -> Tuple Physical Physical
 collide collision@{normal} a b = Tuple a' b'

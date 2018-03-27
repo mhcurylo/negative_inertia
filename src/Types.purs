@@ -41,6 +41,9 @@ setX n (Vector {x,y}) = Vector {x: n,y}
 scale :: Number -> Vector -> Vector
 scale s (Vector {x,y}) = vec (s * x) (s * y)
 
+dot :: Vector -> Vector -> Number
+dot (Vector {x: x1, y: y1}) (Vector {x: x2, y: y2}) = x1 * x2 + y1 * y2
+
 zeroVector :: Vector
 zeroVector = vec 0.0 0.0
 
