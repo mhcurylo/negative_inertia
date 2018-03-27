@@ -3,10 +3,10 @@ import Prelude ((<$>), ($), (>), (<), (>=), (-), (+), negate, (*))
 import Math (abs, max)
 import AABB (Collision, sweepPhysicals)
 import Algorithm (foldPairs)
-import Types(Vector, Physical, getX, getY, vec, scale, oneVector, both, dot)
-import Data.Array (modifyAt, updateAt, mapWithIndex, index)
+import Types(Vector, Physical, getX, getY, vec, scale, dot, opposite)
+import Data.Array (updateAt, mapWithIndex, index)
 import Data.Tuple (Tuple(Tuple))
-import Data.Maybe (Maybe(..), fromMaybe, fromJust)
+import Data.Maybe (Maybe(..), fromJust)
 import Partial.Unsafe (unsafePartial)
 
 movePhysical :: Number -> Physical -> Physical
@@ -65,10 +65,6 @@ unsafeUpdateBothAt f i j v =
     Tuple x' y' = f (unsafeIndex v i) (unsafeIndex v j)
   in
     unsafeUpdateAt j y' (unsafeUpdateAt i x' v)
-
--- | Return a collision with opposite normal
-opposite :: Vector -> Vector
-opposite = (*) (scale (-1.0) oneVector)
 
 -- | Simulate an array of physicals over time
 -- | Recurses for as long as there are collisions
