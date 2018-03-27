@@ -28,13 +28,6 @@ firstCollision v = foldPairs f Nothing (mapWithIndex Tuple v)
         Nothing -> Just {collision, i, j}
       Nothing -> z
 
-deflect :: Vector -> Vector -> Vector
-deflect vel normal = vel * vec nx ny
-  where
-    p x = abs x > 0.0
-    nx = if p (getX normal) then (-1.0) else 1.0
-    ny = if p (getY normal) then (-1.0) else 1.0
-
 -- | Apply collision impulse
 -- |
 -- | Reference https://gafferongames.com/post/collision_response_and_coulomb_friction/
