@@ -6,7 +6,7 @@ import Data.Maybe (Maybe, isJust)
 import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Array (filter, head)
 import Control.Biapply ((<<*>>))
-import Physics (simulate, defaultCollide)
+import Physics (simulate, defaultCollide, CollisionHandler)
 
 
 
@@ -45,6 +45,9 @@ applyInertia t@({inertia, vel}) = t {
     vel = mulV inertia vel
   }
 
+collide :: CollisionHandler
+collide = defaultCollide
+
 move :: GameState -> GameState
 move gs = case ret of
     [b, p1, p2, w1, w2] -> gs {
@@ -54,7 +57,7 @@ move gs = case ret of
     }
     otherwise -> gs
   where
-    ret = applyInertia <$> simulate defaultCollide 1.0 [gs.ball, fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls]
+    ret = applyInertia <$> simulate collide 1.0 [gs.ball, fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls]
 
 score :: GameState -> GameState
 score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0

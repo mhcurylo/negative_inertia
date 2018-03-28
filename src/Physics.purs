@@ -1,4 +1,4 @@
-module Physics(simulate, defaultCollide) where
+module Physics(simulate, defaultCollide, CollisionHandler) where
 import Prelude ((<$>), ($), (>), (<), (>=), (-), (+), negate, (*))
 import Math (abs, max)
 import AABB (Collision, sweepPhysicals)

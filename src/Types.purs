@@ -68,12 +68,15 @@ instance semiringVector :: Semiring Vector where
 instance ringVector :: Ring Vector where
   sub = subV
 
+data PhysicalKind = Ball | Wall | Paddle
+
 type Physical = {
     pos  :: Vector
   , vel  :: Vector
   , acc  :: Vector
   , size :: Vector
   , inertia :: Vector
+  , kind :: PhysicalKind
 }
 
 showPhysical :: Physical -> String
@@ -104,23 +107,21 @@ data Game = Start
   | Progress GameState
   | Finish Int Int 
 
-createPhysical :: Number -> Number -> Number -> Number -> Number -> Number -> Physical
-createPhysical ix iy w h x y = ({
+createPhysical :: PhysicalKind -> Number -> Number -> Number -> Number -> Number -> Number -> Physical
+createPhysical kind ix iy w h x y = ({
     pos: vec x y
   , acc: zeroVector
   , vel: zeroVector
   , size: vec w h
   , inertia: vec ix iy
+  , kind: kind
 }) 
 
-createBox :: Number -> Number -> Number -> Number -> Physical
-createBox = createPhysical 0.0 0.0
-
 createPaddle :: Number -> Number -> Paddle
-createPaddle = createPhysical 0.0 0.95 20.0 70.0
+createPaddle = createPhysical Paddle 0.0 0.95 20.0 70.0
 
 createBall :: Number -> Number -> Ball
-createBall = createPhysical 1.001 1.001 15.0 15.0
+createBall = createPhysical Ball 1.001 1.001 15.0 15.0
 
 createWall :: Number -> Wall
-createWall = createBox 960.0 5.0 20.0
+createWall = createPhysical Wall 0.0 0.0 960.0 5.0 20.0
