@@ -1,4 +1,4 @@
-module Physics(simulate) where
+module Physics(simulate, defaultCollide) where
 import Prelude ((<$>), ($), (>), (<), (>=), (-), (+), negate, (*))
 import Math (abs, max)
 import AABB (Collision, sweepPhysicals)
@@ -9,7 +9,7 @@ import Data.Tuple (Tuple(Tuple))
 import Data.Maybe (Maybe(..), fromJust)
 import Partial.Unsafe (unsafePartial)
 
-type Collide = Collision -> Physical -> Physical -> Tuple Physical Physical
+type CollisionHandler = Collision -> Physical -> Physical -> Tuple Physical Physical
 
 movePhysical :: Number -> Physical -> Physical
 movePhysical time p@{pos, vel, acc} = p {
@@ -42,7 +42,7 @@ applyLinearCollisionImpulse {normal} x@{vel} =
   in
     x { vel = vel + scale j normal }
 
-defaultCollide :: Collide
+defaultCollide :: CollisionHandler
 defaultCollide collision@{normal} a b = Tuple a' b'
   where
     a' = applyLinearCollisionImpulse collision a
@@ -63,17 +63,17 @@ unsafeUpdateBothAt f i j v =
 
 -- | Simulate an array of physicals over time
 -- | Recurses for as long as there are collisions
-simulate :: Number -> Array Physical -> Array Physical
-simulate time v =
+simulate :: CollisionHandler -> Number -> Array Physical -> Array Physical
+simulate collide time v =
   case firstCollision v of
     Just {collision, i, j} ->
       if collision.time >= time
       then justMove
       else
           let
-            updated = (unsafeUpdateBothAt (defaultCollide collision) i j (movePhysical collision.time <$> v))
+            updated = (unsafeUpdateBothAt (collide collision) i j (movePhysical collision.time <$> v))
           in
-            simulate (time - collision.time) updated
+            simulate collide (time - collision.time) updated
     Nothing -> justMove
   where
     justMove = movePhysical time <$> v
