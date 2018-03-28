@@ -31,8 +31,8 @@ firstCollision v = foldPairs f Nothing (mapWithIndex Tuple v)
 -- | Apply collision impulse
 -- |
 -- | Reference https://gafferongames.com/post/collision_response_and_coulomb_friction/
-deflectPhysical :: Collision -> Physical -> Physical
-deflectPhysical {normal} x@{vel} =
+applyLinearCollisionImpulse :: Collision -> Physical -> Physical
+applyLinearCollisionImpulse {normal} x@{vel} =
   let
     restitution = 1.0
     d = dot vel normal
@@ -43,8 +43,8 @@ deflectPhysical {normal} x@{vel} =
 collide :: Collision -> Physical -> Physical -> Tuple Physical Physical
 collide collision@{normal} a b = Tuple a' b'
   where
-    a' = deflectPhysical collision a
-    b' = deflectPhysical collision {normal = opposite normal} b
+    a' = applyLinearCollisionImpulse collision a
+    b' = applyLinearCollisionImpulse collision {normal = opposite normal} b
 
 unsafeIndex :: forall a. Array a -> Int -> a
 unsafeIndex v i = unsafePartial $ fromJust $ index v i
