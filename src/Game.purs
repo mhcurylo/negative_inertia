@@ -3,7 +3,7 @@ module Game (gameLoop, initialGameState) where
 import Prelude (join, negate, (+), (<), (<<<), (>), (<$>), (||), ($))
 import Types
 import Data.Maybe (Maybe, isJust)
-import Data.Tuple (Tuple(Tuple), fst, snd)
+import Data.Tuple (Tuple(Tuple), fst, snd, uncurry)
 import Data.Array (filter, head)
 import Control.Biapply ((<<*>>))
 import Physics (simulate, defaultCollide, CollisionHandler)
@@ -44,6 +44,9 @@ applyInertia :: Physical -> Physical
 applyInertia t@({inertia, vel}) = t {
     vel = mulV inertia vel
   }
+
+composeCollisions :: CollisionHandler -> CollisionHandler -> CollisionHandler
+composeCollisions f g c x y = uncurry (f c) (g c x y)
 
 collide :: CollisionHandler
 collide = defaultCollide
