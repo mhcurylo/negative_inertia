@@ -117,6 +117,9 @@ createPhysical kind ix iy w h x y = ({
   , kind: kind
 }) 
 
+createBox :: Number -> Number -> Number -> Number -> Wall
+createBox = createPhysical Wall 0.0 0.0
+
 createPaddle :: Number -> Number -> Paddle
 createPaddle = createPhysical Paddle 0.0 0.95 20.0 70.0
 
@@ -124,4 +127,4 @@ createBall :: Number -> Number -> Ball
 createBall = createPhysical Ball 1.001 1.001 15.0 15.0
 
 createWall :: Number -> Wall
-createWall = createPhysical Wall 0.0 0.0 960.0 5.0 20.0
+createWall = createBox 960.0 5.0 20.0
