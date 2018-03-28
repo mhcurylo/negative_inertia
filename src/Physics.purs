@@ -9,6 +9,8 @@ import Data.Tuple (Tuple(Tuple))
 import Data.Maybe (Maybe(..), fromJust)
 import Partial.Unsafe (unsafePartial)
 
+type Collide = Collision -> Physical -> Physical -> Tuple Physical Physical
+
 movePhysical :: Number -> Physical -> Physical
 movePhysical time p@{pos, vel, acc} = p {
     pos = pos + scale time vel
@@ -40,8 +42,8 @@ applyLinearCollisionImpulse {normal} x@{vel} =
   in
     x { vel = vel + scale j normal }
 
-collide :: Collision -> Physical -> Physical -> Tuple Physical Physical
-collide collision@{normal} a b = Tuple a' b'
+defaultCollide :: Collide
+defaultCollide collision@{normal} a b = Tuple a' b'
   where
     a' = applyLinearCollisionImpulse collision a
     b' = applyLinearCollisionImpulse collision {normal = opposite normal} b
@@ -67,8 +69,11 @@ simulate time v =
     Just {collision, i, j} ->
       if collision.time >= time
       then justMove
-      else simulate (time - collision.time)
-                    (unsafeUpdateBothAt (collide collision) i j (movePhysical collision.time <$> v))
+      else
+          let
+            updated = (unsafeUpdateBothAt (defaultCollide collision) i j (movePhysical collision.time <$> v))
+          in
+            simulate (time - collision.time) updated
     Nothing -> justMove
   where
     justMove = movePhysical time <$> v
