@@ -53,14 +53,14 @@ collide = defaultCollide
 
 move :: GameState -> GameState
 move gs = case ret of
-    [b, p1, p2, w1, w2] -> gs {
+    [p1, p2, w1, w2, b] -> gs {
       ball = b,
       paddles = Tuple p1 p2,
       walls = Tuple w1 w2
     }
     otherwise -> gs
   where
-    ret = applyInertia <$> simulate collide 1.0 [gs.ball, fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls]
+    ret = applyInertia <$> simulate collide 1.0 [fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls, gs.ball]
 
 score :: GameState -> GameState
 score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0
