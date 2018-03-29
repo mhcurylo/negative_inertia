@@ -3,7 +3,8 @@ module AABB(AABB, fromPhysical, sweepAABB, Collision, sweepPhysicals) where
 import Prelude ((||), (&&), (>=), (<=), (>), (<), (-), (+), (/), (==), otherwise, negate)
 import Data.Number (infinity)
 import Math (max, min)
-import Types (Physical, Vector, getX, getY, vec)
+import Types (Physical)
+import Vector (Vector(Vector), getX, getY, vec)
 import Data.Maybe (Maybe(..))
 
 type Collision = {
@@ -53,10 +54,11 @@ sweepPhysicals a b = sweepAABB v (fromPhysical a) (fromPhysical b)
 -- | Based on https://www.gamedev.net/articles/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/
 -- |
 sweepAABB :: Vector -> AABB -> AABB -> Maybe Collision
-sweepAABB v a b = r
+sweepAABB (Vector {x: vx, y: vy}) a b
+  | vx == 0.0 && (a.right < b.left || a.left > b.right) = Nothing
+  | vy == 0.0 && (a.bottom < b.top || a.top > b.bottom) = Nothing
+  | otherwise = r
   where
-    vx = getX v
-    vy = getY v
     xInvEntry = if vx > 0.0 then b.left - a.right else b.right - a.left
     xInvExit = if vx > 0.0 then b.right - a.left else b.left - a.right
     yInvEntry = if vy > 0.0 then b.top - a.bottom else b.bottom - a.top

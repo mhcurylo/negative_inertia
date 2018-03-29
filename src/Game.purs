@@ -1,18 +1,18 @@
 module Game (gameLoop, initialGameState) where
 
-import Prelude (map, ($), join, negate, (+), (||), (-), (<), (<<<), (>))
-import Types
-import Math (abs)
-import Data.Maybe (Maybe(..), isJust, maybe)
+import Prelude (join, negate, (*), (+), (<), (<<<), (>), (<$>), (||), ($))
+import Types (Ball, Game(..), GameState, Move(..), Paddle, Physical, PhysicalKind(..), PlayerMoves, both, createBall, createPaddle, createWall)
+import Vector (Vector, getX, scale, vec, origin)
+import Data.Maybe (Maybe, isJust)
 import Data.Tuple (Tuple(Tuple), fst, snd)
-import Data.Array (filter, find, head)
+import Data.Array (filter, head)
 import Control.Biapply ((<<*>>))
-import AABB (Collision, sweepPhysicals)
-
+import Physics (simulate, defaultCollide, composeCollisions, CollisionHandler)
+import AABB (Collision)
 
 
 accBall :: Ball -> Ball
-accBall b = b {vel = vec 4.0 4.8}
+accBall b = b {vel = vec 4.0 0.0}
 
 initialGameState :: GameState
 initialGameState = ({
@@ -28,7 +28,7 @@ accUp = vec 0.0 (-1.2)
 accDown :: Vector
 accDown = vec 0.0 1.2
 accStay :: Vector
-accStay = zeroVector  
+accStay = origin  
 
 movePlayer :: Move -> Paddle -> Paddle
 movePlayer Up p = p {acc = accUp} 
@@ -38,54 +38,35 @@ movePlayer Stay p = p {acc = accStay }
 playerMoves :: PlayerMoves -> GameState -> GameState
 playerMoves pms gs@({paddles}) = gs { paddles = (both movePlayer pms <<*>> paddles) }
 
-movePhysical :: Physical -> Physical
-movePhysical p@{pos, vel, acc} = p {
-    pos = pos + vel
-  , vel = vel + acc
-  , acc = acc
-  }
-
 firstJust :: forall a . Array (Maybe a) -> Maybe a
 firstJust = join <<< head <<< filter isJust 
 
-deflect :: Vector -> Vector -> Vector
-deflect vel normal = mulV vel (vec nx ny) 
-  where
-    p x = abs x > 0.0
-    nx = if p (getX normal) then (-1.0) else 1.0
-    ny = if p (getY normal) then (-1.0) else 1.0
-
-deflectPhysical :: Physical -> Collision -> Physical
-deflectPhysical x {time: time, normal: normal} =
-  x {
-    pos = x.pos + scale time x.vel + scale (1.0 - time) deflectedVel,
-    vel = deflect x.vel normal
-  }
-  where
-    deflectedVel = deflect x.vel normal
-
 applyInertia :: Physical -> Physical
 applyInertia t@({inertia, vel}) = t {
-    vel = mulV inertia vel
+    vel = inertia * vel
   }
 
-doPhysical :: Physical -> Array Physical -> Physical
-doPhysical thing s =
-    case find isJust $ map (sweepPhysicals thing') s of
-      Just (Just x) -> deflectPhysical thing' x
-      otherwise -> movePhysical thing'
-    where
-    thing' = applyInertia thing      
+responsiveBall :: Collision -> Ball -> Paddle -> Ball
+responsiveBall collision ball@{vel} paddle = ball { vel = vel + scale 0.2 paddle.vel }
 
+ballVsPaddle :: CollisionHandler
+ballVsPaddle c x@{kind: Ball} y@{kind: Paddle} = Tuple (responsiveBall c x y) y
+ballVsPaddle c x@{kind: Paddle} y@{kind: Ball} = Tuple x (responsiveBall c y x)
+ballVsPaddle c x y = Tuple x y
+
+collide :: CollisionHandler
+collide = composeCollisions ballVsPaddle defaultCollide
 
 move :: GameState -> GameState
-move gs = gs {
-    ball = doPhysical gs.ball [fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls],
-    paddles = Tuple paddle1 paddle2
-  }
+move gs = case ret of
+    [p1, p2, w1, w2, b] -> gs {
+      ball = b,
+      paddles = Tuple p1 p2,
+      walls = Tuple w1 w2
+    }
+    otherwise -> gs
   where
-    paddle1 = doPhysical (fst gs.paddles) [fst gs.walls, snd gs.walls]
-    paddle2 = doPhysical (snd gs.paddles) [fst gs.walls, snd gs.walls]
+    ret = applyInertia <$> simulate collide 1.0 [fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls, gs.ball]
 
 score :: GameState -> GameState
 score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0

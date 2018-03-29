@@ -5,6 +5,8 @@ import Graphics.Drawing.Font (font, sansSerif, bold, Font)
 import Graphics.Drawing (Drawing, black, fillColor, filled, rectangle, text, white)
 import Data.Tuple (Tuple(Tuple))
 import Data.Foldable (foldMap)
+import Algorithm (listTuple)
+import Vector (getX, getY)
 
 import Types 
 
@@ -19,9 +21,6 @@ drawSquare ({pos, size}) = filled (fillColor white) (rectangle (getX pos) (getY 
 
 drawScores :: Scores -> Drawing
 drawScores (Tuple p1 p2) = text scoreFont 490.0 25.0 (fillColor white) (showScores p1 p2)
-
-listTuple :: forall a . Tuple a a -> Array a
-listTuple (Tuple x y) = [x, y]
 
 background :: Drawing
 background = filled (fillColor black) (rectangle 0.0 0.0 1000.0 6000.0) 
@@ -39,6 +38,7 @@ drawGameState :: Game -> Drawing
 drawGameState (Progress ({ball, paddles, scores, walls}))  = background
   <>  (foldMap drawSquare $ join [listTuple paddles, listTuple walls, [ball]])
   <> drawScores scores
+
 drawGameState (Start) = background <> pressToPlay <> mainText "NEGATIVE INERTIA"
 drawGameState (Finish p1 p2) = background <> pressToPlay <> mainText (winner <> " WON") <> finalScores (showScores p1 p2)
   where

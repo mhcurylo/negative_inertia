@@ -11,7 +11,7 @@ import Graphics.Canvas (CANVAS, getCanvasElementById, getContext2D)
 
 import Partial.Unsafe (unsafePartial)
 import GameEngine (animateGame)
-import Game (gameLoop, initialGameState)
+import Game (gameLoop)
 import Types (Game(Start))
 import Draw (drawGameState)
 import Input (input)

@@ -3,64 +3,11 @@ module Types where
 import Prelude 
 import Data.Tuple (Tuple)
 import Data.Bifunctor (bimap) 
-import Data.Generic (class Generic)
+import Vector (Vector, vec, origin)
 
 data Move = Up | Down | Stay
 
-data Vector = Vector {
-    x :: Number
-  , y :: Number
-}
-
-derive instance genericVector :: Generic Vector
-
-addV :: Vector -> Vector -> Vector
-addV (Vector a) (Vector b) = vec (a.x + b.x) (a.y + b.y)
-
-subV :: Vector -> Vector -> Vector
-subV (Vector a) (Vector b) = vec (a.x - b.x) (a.y - b.y)
-
-mulV :: Vector -> Vector -> Vector
-mulV (Vector a) (Vector b) = vec (a.x * b.x) (a.y * b.y)
-
-vec :: Number -> Number -> Vector
-vec x y = Vector ({x, y})  
-
-getX :: Vector -> Number
-getX (Vector {x}) = x
-
-getY :: Vector -> Number
-getY (Vector {y}) = y
-
-setY :: Number -> Vector -> Vector
-setY n (Vector {x,y}) = Vector {x,y: n}  
-
-setX :: Number -> Vector -> Vector
-setX n (Vector {x,y}) = Vector {x: n,y}  
-
-scale :: Number -> Vector -> Vector
-scale s (Vector {x,y}) = vec (s * x) (s * y)
-
-zeroVector :: Vector
-zeroVector = vec 0.0 0.0
-
-oneVector :: Vector
-oneVector = vec 1.0 1.0  
-
-instance eqVector :: Eq Vector where
-  eq (Vector v1) (Vector v2) = v1.x == v2.x && v1.y == v2.y
-
-instance showVector :: Show Vector where
-  show (Vector {x, y}) = "Vector x: " <> show x <> ", y: " <> show y <> ";" 
-
-instance semiringVector :: Semiring Vector where
-  add = addV
-  mul = mulV
-  one = oneVector
-  zero = zeroVector
-
-instance ringVector :: Ring Vector where
-  sub = subV
+data PhysicalKind = Ball | Wall | Paddle
 
 type Physical = {
     pos  :: Vector
@@ -68,6 +15,7 @@ type Physical = {
   , acc  :: Vector
   , size :: Vector
   , inertia :: Vector
+  , kind :: PhysicalKind
 }
 
 showPhysical :: Physical -> String
@@ -98,23 +46,24 @@ data Game = Start
   | Progress GameState
   | Finish Int Int 
 
-createPhysical :: Number -> Number -> Number -> Number -> Number -> Number -> Physical
-createPhysical ix iy w h x y = ({
+createPhysical :: PhysicalKind -> Number -> Number -> Number -> Number -> Number -> Number -> Physical
+createPhysical kind ix iy w h x y = ({
     pos: vec x y
-  , acc: zeroVector
-  , vel: zeroVector
+  , acc: origin
+  , vel: origin
   , size: vec w h
   , inertia: vec ix iy
+  , kind: kind
 }) 
 
-createBox :: Number -> Number -> Number -> Number -> Physical
-createBox = createPhysical 0.0 0.0
+createBox :: Number -> Number -> Number -> Number -> Wall
+createBox = createPhysical Wall 0.0 0.0
 
 createPaddle :: Number -> Number -> Paddle
-createPaddle = createPhysical 0.0 0.95 20.0 70.0
+createPaddle = createPhysical Paddle 0.0 0.95 20.0 70.0
 
 createBall :: Number -> Number -> Ball
-createBall = createPhysical 1.001 1.001 15.0 15.0
+createBall = createPhysical Ball 1.001 1.001 15.0 15.0
 
 createWall :: Number -> Wall
 createWall = createBox 960.0 5.0 20.0
