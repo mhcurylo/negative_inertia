@@ -1,7 +1,7 @@
 module Game (gameLoop, initialGameState) where
 
 import Prelude (join, negate, (+), (<), (<<<), (>), (<$>), (||), ($))
-import Types (Ball, Game(..), GameState, Move(..), Paddle, Physical, PhysicalKind(..), PlayerMoves, Vector, both, createBall, createPaddle, createWall, getX, mulV, scale, vec, zeroVector)
+import Types (Ball, Game(..), GameState, Move(..), Paddle, Physical, PhysicalKind(..), PlayerMoves, Vector, both, createBall, createPaddle, createWall, getX, mulV, scale, vec, origin)
 import Data.Maybe (Maybe, isJust)
 import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Array (filter, head)
@@ -27,7 +27,7 @@ accUp = vec 0.0 (-1.2)
 accDown :: Vector
 accDown = vec 0.0 1.2
 accStay :: Vector
-accStay = zeroVector  
+accStay = origin  
 
 movePlayer :: Move -> Paddle -> Paddle
 movePlayer Up p = p {acc = accUp} 

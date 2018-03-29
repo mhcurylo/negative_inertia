@@ -47,8 +47,8 @@ dot (Vector {x: x1, y: y1}) (Vector {x: x2, y: y2}) = x1 * x2 + y1 * y2
 opposite :: Vector -> Vector
 opposite = (*) (scale (-1.0) oneVector)
 
-zeroVector :: Vector
-zeroVector = vec 0.0 0.0
+origin :: Vector
+origin = vec 0.0 0.0
 
 oneVector :: Vector
 oneVector = vec 1.0 1.0  
@@ -63,7 +63,7 @@ instance semiringVector :: Semiring Vector where
   add = addV
   mul = mulV
   one = oneVector
-  zero = zeroVector
+  zero = origin
 
 instance ringVector :: Ring Vector where
   sub = subV
@@ -110,8 +110,8 @@ data Game = Start
 createPhysical :: PhysicalKind -> Number -> Number -> Number -> Number -> Number -> Number -> Physical
 createPhysical kind ix iy w h x y = ({
     pos: vec x y
-  , acc: zeroVector
-  , vel: zeroVector
+  , acc: origin
+  , vel: origin
   , size: vec w h
   , inertia: vec ix iy
   , kind: kind
