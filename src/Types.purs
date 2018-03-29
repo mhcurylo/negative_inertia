@@ -3,8 +3,7 @@ module Types where
 import Prelude 
 import Data.Tuple (Tuple)
 import Data.Bifunctor (bimap) 
-import Data.Generic (class Generic)
-import Vector (Vector(Vector), vec, origin)
+import Vector (Vector, vec, origin)
 
 data Move = Up | Down | Stay
 
