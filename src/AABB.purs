@@ -3,7 +3,8 @@ module AABB(AABB, fromPhysical, sweepAABB, Collision, sweepPhysicals) where
 import Prelude ((||), (&&), (>=), (<=), (>), (<), (-), (+), (/), (==), otherwise, negate)
 import Data.Number (infinity)
 import Math (max, min)
-import Types (Physical, Vector(Vector), getX, getY, vec)
+import Types (Physical)
+import Vector (Vector(Vector), getX, getY, vec)
 import Data.Maybe (Maybe(..))
 
 type Collision = {

@@ -6,6 +6,7 @@ import Graphics.Drawing (Drawing, black, fillColor, filled, rectangle, text, whi
 import Data.Tuple (Tuple(Tuple))
 import Data.Foldable (foldMap)
 import Algorithm (listTuple)
+import Vector (getX, getY)
 
 import Types 
 

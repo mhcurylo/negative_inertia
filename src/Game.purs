@@ -1,7 +1,8 @@
 module Game (gameLoop, initialGameState) where
 
-import Prelude (join, negate, (+), (<), (<<<), (>), (<$>), (||), ($))
-import Types (Ball, Game(..), GameState, Move(..), Paddle, Physical, PhysicalKind(..), PlayerMoves, Vector, both, createBall, createPaddle, createWall, getX, mulV, scale, vec, origin)
+import Prelude (join, negate, (*), (+), (<), (<<<), (>), (<$>), (||), ($))
+import Types (Ball, Game(..), GameState, Move(..), Paddle, Physical, PhysicalKind(..), PlayerMoves, both, createBall, createPaddle, createWall)
+import Vector (Vector, getX, scale, vec, origin)
 import Data.Maybe (Maybe, isJust)
 import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Array (filter, head)
@@ -42,7 +43,7 @@ firstJust = join <<< head <<< filter isJust
 
 applyInertia :: Physical -> Physical
 applyInertia t@({inertia, vel}) = t {
-    vel = mulV inertia vel
+    vel = inertia * vel
   }
 
 responsiveBall :: Collision -> Ball -> Paddle -> Ball

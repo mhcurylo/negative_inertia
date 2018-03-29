@@ -1,7 +1,8 @@
 module Collision (Direction, collide, didCollide, minkowskiDifference, MinkowskiDifference) where
 
 import Prelude (class Show, comparing, max, min, negate, ($), (&&), (*), (+), (-), (<$>), (<=), (>=))
-import Types (Physical, Vector, getX, getY, setX, setY, subV, vec)
+import Types (Physical)
+import Vector (Vector, getX, getY, setX, setY, vec)
 import Data.Maybe (Maybe(Nothing))
 import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Foldable (minimumBy)
@@ -79,7 +80,7 @@ relativeMotion :: Physical -> Physical -> RelativeMotion
 relativeMotion a b = RelativeMotion {source, direction}
   where
   source = center a 
-  direction = subV a.vel b.vel
+  direction = a.vel - b.vel
 
 minkowskiDifference :: Physical -> Physical -> MinkowskiDifference
 minkowskiDifference a b = MinkowskiDifference {mTop, mSize, mBottom}
