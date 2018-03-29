@@ -7,11 +7,12 @@ import Data.Tuple (Tuple(Tuple), fst, snd, uncurry)
 import Data.Array (filter, head)
 import Control.Biapply ((<<*>>))
 import Physics (simulate, defaultCollide, CollisionHandler)
-
+import AABB (Collision)
+import Debug.Trace
 
 
 accBall :: Ball -> Ball
-accBall b = b {vel = vec 4.0 4.8}
+accBall b = b {vel = vec 4.0 0.0}
 
 initialGameState :: GameState
 initialGameState = ({
@@ -48,8 +49,16 @@ applyInertia t@({inertia, vel}) = t {
 composeCollisions :: CollisionHandler -> CollisionHandler -> CollisionHandler
 composeCollisions f g c x y = uncurry (f c) (g c x y)
 
+responsiveBall :: Collision -> Ball -> Paddle -> Ball
+responsiveBall collision ball@{vel} paddle = ball { vel = vel + scale 0.1 paddle.vel }
+
+ballVsPaddle :: CollisionHandler
+ballVsPaddle c x@{kind: Ball} y@{kind: Paddle} = Tuple (responsiveBall c x y) y
+ballVsPaddle c x@{kind: Paddle} y@{kind: Ball} = Tuple x (responsiveBall c y x)
+ballVsPaddle c x y = Tuple x y
+
 collide :: CollisionHandler
-collide = defaultCollide
+collide = composeCollisions ballVsPaddle defaultCollide
 
 move :: GameState -> GameState
 move gs = case ret of
