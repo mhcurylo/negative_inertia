@@ -4,11 +4,11 @@ module Physics (
   CollisionHandler,
   composeCollisions
 ) where
-import Prelude ((<$>), ($), (>), (<), (>=), (-), (+), negate, (*))
-import Math (abs, max)
+import Prelude ((<$>), ($), (<), (>=), (-), (+), negate, (*))
+import Math (max)
 import AABB (Collision, sweepPhysicals)
 import Algorithm (foldPairs)
-import Types(Vector, Physical, getX, getY, vec, scale, dot, opposite)
+import Types(Physical, scale, dot, opposite)
 import Data.Array (updateAt, mapWithIndex, index)
 import Data.Tuple (Tuple(Tuple), uncurry)
 import Data.Maybe (Maybe(..), fromJust)

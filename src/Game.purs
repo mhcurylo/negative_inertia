@@ -1,14 +1,13 @@
 module Game (gameLoop, initialGameState) where
 
 import Prelude (join, negate, (+), (<), (<<<), (>), (<$>), (||), ($))
-import Types
+import Types (Ball, Game(..), GameState, Move(..), Paddle, Physical, PhysicalKind(..), PlayerMoves, Vector, both, createBall, createPaddle, createWall, getX, mulV, scale, vec, zeroVector)
 import Data.Maybe (Maybe, isJust)
 import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Array (filter, head)
 import Control.Biapply ((<<*>>))
 import Physics (simulate, defaultCollide, composeCollisions, CollisionHandler)
 import AABB (Collision)
-import Debug.Trace
 
 
 accBall :: Ball -> Ball
