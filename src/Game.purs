@@ -50,7 +50,7 @@ composeCollisions :: CollisionHandler -> CollisionHandler -> CollisionHandler
 composeCollisions f g c x y = uncurry (f c) (g c x y)
 
 responsiveBall :: Collision -> Ball -> Paddle -> Ball
-responsiveBall collision ball@{vel} paddle = ball { vel = vel + scale 0.1 paddle.vel }
+responsiveBall collision ball@{vel} paddle = ball { vel = vel + scale 0.2 paddle.vel }
 
 ballVsPaddle :: CollisionHandler
 ballVsPaddle c x@{kind: Ball} y@{kind: Paddle} = Tuple (responsiveBall c x y) y
