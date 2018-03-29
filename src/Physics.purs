@@ -1,15 +1,23 @@
-module Physics(simulate, defaultCollide, CollisionHandler) where
+module Physics (
+  simulate,
+  defaultCollide,
+  CollisionHandler,
+  composeCollisions
+) where
 import Prelude ((<$>), ($), (>), (<), (>=), (-), (+), negate, (*))
 import Math (abs, max)
 import AABB (Collision, sweepPhysicals)
 import Algorithm (foldPairs)
 import Types(Vector, Physical, getX, getY, vec, scale, dot, opposite)
 import Data.Array (updateAt, mapWithIndex, index)
-import Data.Tuple (Tuple(Tuple))
+import Data.Tuple (Tuple(Tuple), uncurry)
 import Data.Maybe (Maybe(..), fromJust)
 import Partial.Unsafe (unsafePartial)
 
 type CollisionHandler = Collision -> Physical -> Physical -> Tuple Physical Physical
+
+composeCollisions :: CollisionHandler -> CollisionHandler -> CollisionHandler
+composeCollisions f g c x y = uncurry (f c) (g c x y)
 
 movePhysical :: Number -> Physical -> Physical
 movePhysical time p@{pos, vel, acc} = p {

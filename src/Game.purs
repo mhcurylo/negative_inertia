@@ -3,10 +3,10 @@ module Game (gameLoop, initialGameState) where
 import Prelude (join, negate, (+), (<), (<<<), (>), (<$>), (||), ($))
 import Types
 import Data.Maybe (Maybe, isJust)
-import Data.Tuple (Tuple(Tuple), fst, snd, uncurry)
+import Data.Tuple (Tuple(Tuple), fst, snd)
 import Data.Array (filter, head)
 import Control.Biapply ((<<*>>))
-import Physics (simulate, defaultCollide, CollisionHandler)
+import Physics (simulate, defaultCollide, composeCollisions, CollisionHandler)
 import AABB (Collision)
 import Debug.Trace
 
@@ -45,9 +45,6 @@ applyInertia :: Physical -> Physical
 applyInertia t@({inertia, vel}) = t {
     vel = mulV inertia vel
   }
-
-composeCollisions :: CollisionHandler -> CollisionHandler -> CollisionHandler
-composeCollisions f g c x y = uncurry (f c) (g c x y)
 
 responsiveBall :: Collision -> Ball -> Paddle -> Ball
 responsiveBall collision ball@{vel} paddle = ball { vel = vel + scale 0.2 paddle.vel }
