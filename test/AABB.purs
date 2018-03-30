@@ -9,7 +9,7 @@ import Prelude (Unit, discard, negate, ($), (&&), (+), (==))
 import Test.Unit (test, TestF)
 import Test.Unit.QuickCheck (quickCheck)
 import Types (createBox, Physical)
-import Vector (Vector(..), vec)
+import Vector (Vector, vec)
 
 sameCollision :: Maybe Collision -> Maybe Collision -> Boolean
 sameCollision (Just a) (Just b) = a.time == b.time && a.normal == b.normal
