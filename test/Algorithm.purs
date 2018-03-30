@@ -6,7 +6,7 @@ import Algorithm (foldPairs, listTuple)
 import Control.Monad.Eff.Random (RANDOM)
 import Control.Monad.Free (Free)
 import Data.Tuple (Tuple(..))
-import Test.QuickCheck (QC, (===))
+import Test.QuickCheck ((===))
 import Test.Unit (test, TestF)
 import Test.Unit.QuickCheck (quickCheck)
 
