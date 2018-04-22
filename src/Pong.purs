@@ -35,6 +35,22 @@ moveBall game = game {
     }
   }
 
+paddle1VsBall :: Game -> Game
+paddle1VsBall game@{ball, ballSize, paddles, paddleHeight, paddleWidth} = r
+  where
+    r = if intersects
+        then game {
+            ball {
+              x = paddle1.x + paddleWidth
+            }
+          }
+        else game
+    paddle1 = unsafePartial $ unsafeIndex paddles 0
+    intersects =
+      ball.x < paddle1.x + paddleWidth
+        && ball.y + ballSize > paddle1.y
+        && ball.y < paddle1.y + paddleHeight
+
 paddle2VsBall :: Game -> Game
 paddle2VsBall game@{ball, ballSize, paddles, paddleHeight} = r
   where
@@ -105,7 +121,8 @@ init canvasWidth canvasHeight = {
     paddleY = (canvasHeight * 0.5 - paddleHeight * 0.5)
 
 move :: GameInput -> Game -> Game
-move input game = paddle2VsBall
+move input game = paddle1VsBall
+                $ paddle2VsBall
                 $ movePaddles [paddle1Velocity, paddle2Velocity]
                 $ moveBall game
   where
