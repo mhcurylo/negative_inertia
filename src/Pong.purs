@@ -1,9 +1,10 @@
 module Pong(init, move) where
-import Prelude ((+), (/), (*), (-), negate, pure, bind, Unit, discard, unit, ($), (>>=), otherwise)
+import Prelude ((&&), (>), (<), (+), (/), (*), (-), negate, pure, bind, Unit, discard, unit, ($), (>>=), otherwise)
 import Data.Identity
 import Data.Ord (clamp)
 import Data.Tuple
 import Data.Array
+import Partial.Unsafe (unsafePartial)
 
 type Vector = {
   x :: Number,
@@ -33,6 +34,22 @@ moveBall game = game {
       y = game.ball.y + game.ballVelocity.y
     }
   }
+
+paddle2VsBall :: Game -> Game
+paddle2VsBall game@{ball, ballSize, paddles, paddleHeight} = r
+  where
+    r = if intersects
+        then game {
+            ball {
+              x = paddle2.x - ballSize
+            }
+          }
+        else game
+    paddle2 = unsafePartial $ unsafeIndex paddles 1
+    intersects =
+        ball.x > paddle2.x - ballSize
+      && ball.y + ballSize > paddle2.y
+      && ball.y < paddle2.y + paddleHeight
 
 movePaddles :: Array Number -> Game -> Game
 movePaddles velocities game = game {
@@ -88,7 +105,8 @@ init canvasWidth canvasHeight = {
     paddleY = (canvasHeight * 0.5 - paddleHeight * 0.5)
 
 move :: GameInput -> Game -> Game
-move input game = movePaddles [paddle1Velocity, paddle2Velocity]
+move input game = paddle2VsBall
+                $ movePaddles [paddle1Velocity, paddle2Velocity]
                 $ moveBall game
   where
     paddle1Velocity = paddleVelocity input.player1 game.paddleSpeed
