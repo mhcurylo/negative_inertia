@@ -1,7 +1,7 @@
 module Pong(init, move) where
 import Prelude ((+), (/), (*), (-), negate, pure, bind, Unit, discard, unit, ($), (>>=), otherwise)
 import Data.Identity
-import Math (max, min)
+import Data.Ord (clamp)
 import Data.Tuple
 import Data.Array
 
@@ -33,16 +33,6 @@ moveBall game = game {
       y = game.ball.y + game.ballVelocity.y
     }
   }
-
--- | Results in third argument clamped within range of first and second
--- |
--- | ```purescript
--- | clamp 0.0 1.0 0.5 = 0.5
--- | clamp 0.0 1.0 2.0 = 1.0
--- | clamp 1.0 2.0 0.0 = 1.0
--- | ```
-clamp :: Number -> Number -> Number -> Number
-clamp minVal maxVal x = min maxVal (max minVal x)
 
 movePaddles :: Array Number -> Game -> Game
 movePaddles velocities game = game {
