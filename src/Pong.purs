@@ -36,11 +36,11 @@ moveBall game = game {
 
 movePaddles :: Array Number -> Game -> Game
 movePaddles velocities game = game {
-    paddles = zipWith f game.paddles velocities
+    paddles = zipWith movePaddle game.paddles velocities
   }
   where
-    f :: Vector -> Number -> Vector
-    f paddle@{y} velocity = paddle {
+    movePaddle :: Vector -> Number -> Vector
+    movePaddle paddle@{y} velocity = paddle {
         y = clamp 0.0 (game.canvasHeight - game.paddleHeight) (y + velocity)
       }
 
