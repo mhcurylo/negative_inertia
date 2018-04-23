@@ -1,4 +1,4 @@
-module Pong(init, move, GameInput, PlayerInput) where
+module Pong(init, move, PongInput, PlayerInput) where
 import Prelude ((&&), (>), (<), (+), (/), (*), (-), negate, pure, bind, Unit, discard, unit, ($), (>>=), otherwise)
 import Data.Identity
 import Data.Ord (clamp)
@@ -16,9 +16,23 @@ type PlayerInput = {
   down :: Boolean
 }
 
-type GameInput = {
+type PongInput = {
   player1 :: PlayerInput,
   player2 :: PlayerInput
+}
+
+type Pong = {
+  canvasWidth :: Number,
+  canvasHeight :: Number,
+  ballSize :: Number,
+  ballSpeed :: Number,
+  paddleWidth :: Number,
+  paddleHeight :: Number,
+  paddleSpeed :: Number,
+  paddles :: Array Vector,
+  scores :: Array Int,
+  ball :: Vector,
+  ballVelocity :: Vector
 }
 
 paddleVelocity :: PlayerInput -> Number -> Number
@@ -27,7 +41,7 @@ paddleVelocity {up, down} paddleSpeed
   | down = paddleSpeed
   | otherwise = 0.0
 
-moveBall :: Game -> Game
+moveBall :: Pong -> Pong
 moveBall game = game {
     ball {
       x = game.ball.x + game.ballVelocity.x,
@@ -35,7 +49,7 @@ moveBall game = game {
     }
   }
 
-paddle1VsBall :: Game -> Game
+paddle1VsBall :: Pong -> Pong
 paddle1VsBall game@{ball, ballSize, paddles, paddleHeight, paddleWidth} = r
   where
     r = if intersects
@@ -51,7 +65,7 @@ paddle1VsBall game@{ball, ballSize, paddles, paddleHeight, paddleWidth} = r
         && ball.y + ballSize > paddle1.y
         && ball.y < paddle1.y + paddleHeight
 
-paddle2VsBall :: Game -> Game
+paddle2VsBall :: Pong -> Pong
 paddle2VsBall game@{ball, ballSize, paddles, paddleHeight} = r
   where
     r = if intersects
@@ -67,7 +81,7 @@ paddle2VsBall game@{ball, ballSize, paddles, paddleHeight} = r
       && ball.y + ballSize > paddle2.y
       && ball.y < paddle2.y + paddleHeight
 
-movePaddles :: Array Number -> Game -> Game
+movePaddles :: Array Number -> Pong -> Pong
 movePaddles velocities game = game {
     paddles = zipWith movePaddle game.paddles velocities
   }
@@ -77,24 +91,10 @@ movePaddles velocities game = game {
         y = clamp 0.0 (game.canvasHeight - game.paddleHeight) (y + velocity)
       }
 
-type Game = {
-  canvasWidth :: Number,
-  canvasHeight :: Number,
-  ballSize :: Number,
-  ballSpeed :: Number,
-  paddleWidth :: Number,
-  paddleHeight :: Number,
-  paddleSpeed :: Number,
-  paddles :: Array Vector,
-  scores :: Array Int,
-  ball :: Vector,
-  ballVelocity :: Vector
-}
-
 vec :: Number -> Number -> Vector
 vec x y = {x, y}
 
-init :: Number -> Number -> Game
+init :: Number -> Number -> Pong
 init canvasWidth canvasHeight = {
     canvasWidth: canvasWidth,
     canvasHeight: canvasHeight,
@@ -120,7 +120,7 @@ init canvasWidth canvasHeight = {
     paddleHeight = 40.0 * s
     paddleY = (canvasHeight * 0.5 - paddleHeight * 0.5)
 
-move :: GameInput -> Game -> Game
+move :: PongInput -> Pong -> Pong
 move input game = paddle1VsBall
                 $ paddle2VsBall
                 $ movePaddles [paddle1Velocity, paddle2Velocity]

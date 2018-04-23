@@ -11,7 +11,7 @@ import FRP.Behavior.Keyboard (keys)
 import FRP.Behavior (ABehavior)
 import FRP.Event (Event)
 import Types (Move(Down, Up, Stay), PlayerMoves)
-import Pong (GameInput)
+import Pong (PongInput)
  
 type KeyMap = Map Int Move
 type KeyMaps = Tuple KeyMap KeyMap 
@@ -30,7 +30,7 @@ keysToMove pressedKeys = bimap toMove toMove keyMaps
   where
   toMove = mapToMove pressedKeys
 
-keysToGameInput :: Set Int -> GameInput
+keysToGameInput :: Set Int -> PongInput
 keysToGameInput pressedKeys = {
     player1: {
       up: member 65 pressedKeys,
