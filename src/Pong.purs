@@ -41,6 +41,20 @@ paddleVelocity {up, down} paddleSpeed
   | down = paddleSpeed
   | otherwise = 0.0
 
+clampBall :: Pong -> Pong
+clampBall game@{ball, ballSize, canvasHeight} =
+  game {
+    ball {
+      y = clamp 0.0 (canvasHeight - ballSize) ball.y
+    }
+  }
+
+ballVsWalls :: Pong -> Pong
+ballVsWalls game@{ball, ballSize, ballVelocity, canvasHeight}
+  | ball.y < 0.0 = game { ballVelocity { y = -ballVelocity.y }}
+  | ball.y + ballSize > canvasHeight = game { ballVelocity { y = -ballVelocity.y }}
+  | otherwise = game
+
 moveBall :: Pong -> Pong
 moveBall game = game {
     ball {
@@ -118,7 +132,7 @@ initPong canvasWidth canvasHeight = {
       0
     ],
     ball: vec (canvasWidth * 0.5 - ballSize * 0.5) (canvasHeight * 0.5 - ballSize * 0.5),
-    ballVelocity: vec ballSpeed 0.0
+    ballVelocity: vec ballSpeed ballSpeed
   }
   where
     s = canvasHeight / 150.0
@@ -129,7 +143,10 @@ initPong canvasWidth canvasHeight = {
     paddleY = (canvasHeight * 0.5 - paddleHeight * 0.5)
 
 movePong :: PongInput -> Pong -> Pong
-movePong input game = paddle1VsBall
+movePong input game =
+                  clampBall
+                $ ballVsWalls
+                $ paddle1VsBall
                 $ paddle2VsBall
                 $ movePaddles [paddle1Velocity, paddle2Velocity]
                 $ moveBall game
