@@ -26,7 +26,7 @@ game = do
   let canvas = unsafePartial (fromJust mc)
   ctx <- getContext2D canvas
   w <- getCanvasWidth canvas
-  h <- getCanvasWidth canvas
+  h <- getCanvasHeight canvas
   pong <- pure $ initPong w h
   _ <- animateGame input gameLoop Start (render ctx <<< drawGameState)
   pure unit
