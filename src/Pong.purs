@@ -1,4 +1,4 @@
-module Pong(initPong, movePong, PongInput, PlayerInput) where
+module Pong(initPong, movePong, Vector, Pong, PongInput, PlayerInput) where
 import Prelude ((&&), (>), (<), (+), (/), (*), (-), negate, pure, bind, Unit, discard, unit, ($), (>>=), otherwise)
 import Data.Identity
 import Data.Ord (clamp)

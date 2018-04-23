@@ -13,9 +13,9 @@ import Partial.Unsafe (unsafePartial)
 import GameEngine (animateGame)
 import Game (gameLoop)
 import Types (Game(Start))
-import Draw (drawGameState)
-import Input (input)
-import Pong (initPong)
+import Draw (drawGameState, drawPongState)
+import Input (input, inputPong)
+import Pong (initPong, movePong)
 
 import FRP (FRP)
 foreign import hot :: forall eff. Eff eff Unit
@@ -27,8 +27,9 @@ game = do
   ctx <- getContext2D canvas
   w <- getCanvasWidth canvas
   h <- getCanvasHeight canvas
-  pong <- pure $ initPong w h
-  _ <- animateGame input gameLoop Start (render ctx <<< drawGameState)
+  initialPongState <- pure $ initPong w h
+  -- _ <- animateGame input gameLoop Start (render ctx <<< drawGameState)
+  _ <- animateGame inputPong movePong initialPongState (render ctx <<< drawPongState)
   pure unit
 
 main :: Unit

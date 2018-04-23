@@ -1,4 +1,4 @@
-module Draw (drawGameState) where
+module Draw (drawGameState, drawPongState) where
 
 import Prelude (join, show, ($), (<>), (>))
 import Graphics.Drawing.Font (font, sansSerif, bold, Font)
@@ -7,6 +7,7 @@ import Data.Tuple (Tuple(Tuple))
 import Data.Foldable (foldMap)
 import Algorithm (listTuple)
 import Vector (getX, getY)
+import Pong (Pong)
 
 import Types 
 
@@ -33,6 +34,9 @@ finalScores = text scoreFont 100.0 200.0 (fillColor white)
 
 pressToPlay :: Drawing 
 pressToPlay = text scoreFont 100.0 300.0 (fillColor white) "Press to play!"
+
+drawPongState :: Pong -> Drawing
+drawPongState pong = background
 
 drawGameState :: Game -> Drawing
 drawGameState (Progress ({ball, paddles, scores, walls}))  = background

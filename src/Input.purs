@@ -1,4 +1,4 @@
-module Input (input) where
+module Input (input, inputPong) where
 
 import Prelude (($), (<$>), (<<<), flip)
 import Data.Tuple (Tuple(Tuple))
@@ -41,6 +41,9 @@ keysToGameInput pressedKeys = {
       down: member 40 pressedKeys
     }
   }
+
+inputPong :: ABehavior Event PongInput
+inputPong = keysToGameInput <$> keys
 
 input :: ABehavior Event PlayerMoves
 input = keysToMove <$> keys  
