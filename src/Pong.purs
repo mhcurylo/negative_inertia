@@ -50,12 +50,15 @@ moveBall game = game {
   }
 
 paddle1VsBall :: Pong -> Pong
-paddle1VsBall game@{ball, ballSize, paddles, paddleHeight, paddleWidth} = r
+paddle1VsBall game@{ball, ballSize, ballVelocity, paddles, paddleHeight, paddleWidth} = r
   where
     r = if intersects
         then game {
             ball {
               x = paddle1.x + paddleWidth
+            },
+            ballVelocity {
+              x = -ballVelocity.x
             }
           }
         else game
@@ -66,12 +69,15 @@ paddle1VsBall game@{ball, ballSize, paddles, paddleHeight, paddleWidth} = r
         && ball.y < paddle1.y + paddleHeight
 
 paddle2VsBall :: Pong -> Pong
-paddle2VsBall game@{ball, ballSize, paddles, paddleHeight} = r
+paddle2VsBall game@{ball, ballSize, ballVelocity, paddles, paddleHeight} = r
   where
     r = if intersects
         then game {
             ball {
               x = paddle2.x - ballSize
+            },
+            ballVelocity {
+              x = -ballVelocity.x
             }
           }
         else game
@@ -99,7 +105,7 @@ initPong canvasWidth canvasHeight = {
     canvasWidth: canvasWidth,
     canvasHeight: canvasHeight,
     ballSize: ballSize,
-    ballSpeed: 2.0 * s,
+    ballSpeed: ballSpeed,
     paddleWidth: 6.0 * s,
     paddleHeight: 40.0 * s,
     paddleSpeed: 3.0 * s,
@@ -112,13 +118,14 @@ initPong canvasWidth canvasHeight = {
       0
     ],
     ball: vec (canvasWidth * 0.5 - ballSize * 0.5) (canvasHeight * 0.5 - ballSize * 0.5),
-    ballVelocity: vec 0.0 0.0
+    ballVelocity: vec ballSpeed 0.0
   }
   where
     s = canvasHeight / 150.0
     paddleWidth = 6.0 * s
     paddleHeight = 40.0 * s
     ballSize = 6.0 * s
+    ballSpeed = 2.0 * s
     paddleY = (canvasHeight * 0.5 - paddleHeight * 0.5)
 
 movePong :: PongInput -> Pong -> Pong
