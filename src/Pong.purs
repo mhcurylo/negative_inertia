@@ -1,4 +1,4 @@
-module Pong(init, move, PongInput, PlayerInput) where
+module Pong(initPong, movePong, PongInput, PlayerInput) where
 import Prelude ((&&), (>), (<), (+), (/), (*), (-), negate, pure, bind, Unit, discard, unit, ($), (>>=), otherwise)
 import Data.Identity
 import Data.Ord (clamp)
@@ -94,8 +94,8 @@ movePaddles velocities game = game {
 vec :: Number -> Number -> Vector
 vec x y = {x, y}
 
-init :: Number -> Number -> Pong
-init canvasWidth canvasHeight = {
+initPong :: Number -> Number -> Pong
+initPong canvasWidth canvasHeight = {
     canvasWidth: canvasWidth,
     canvasHeight: canvasHeight,
     ballSize: 6.0 * s,
@@ -120,8 +120,8 @@ init canvasWidth canvasHeight = {
     paddleHeight = 40.0 * s
     paddleY = (canvasHeight * 0.5 - paddleHeight * 0.5)
 
-move :: PongInput -> Pong -> Pong
-move input game = paddle1VsBall
+movePong :: PongInput -> Pong -> Pong
+movePong input game = paddle1VsBall
                 $ paddle2VsBall
                 $ movePaddles [paddle1Velocity, paddle2Velocity]
                 $ moveBall game
