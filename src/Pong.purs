@@ -98,7 +98,7 @@ initPong :: Number -> Number -> Pong
 initPong canvasWidth canvasHeight = {
     canvasWidth: canvasWidth,
     canvasHeight: canvasHeight,
-    ballSize: 6.0 * s,
+    ballSize: ballSize,
     ballSpeed: 2.0 * s,
     paddleWidth: 6.0 * s,
     paddleHeight: 40.0 * s,
@@ -111,13 +111,14 @@ initPong canvasWidth canvasHeight = {
       0,
       0
     ],
-    ball: vec 0.0 0.0,
+    ball: vec (canvasWidth * 0.5 - ballSize * 0.5) (canvasHeight * 0.5 - ballSize * 0.5),
     ballVelocity: vec 0.0 0.0
   }
   where
     s = canvasHeight / 150.0
     paddleWidth = 6.0 * s
     paddleHeight = 40.0 * s
+    ballSize = 6.0 * s
     paddleY = (canvasHeight * 0.5 - paddleHeight * 0.5)
 
 movePong :: PongInput -> Pong -> Pong

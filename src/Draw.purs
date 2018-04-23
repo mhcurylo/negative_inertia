@@ -35,14 +35,21 @@ finalScores = text scoreFont 100.0 200.0 (fillColor white)
 pressToPlay :: Drawing 
 pressToPlay = text scoreFont 100.0 300.0 (fillColor white) "Press to play!"
 
+whiteRectangle :: Number -> Number -> Number -> Number -> Drawing
+whiteRectangle x y w h = filled (fillColor white) (rectangle x y w h)
+
+drawBall :: Pong -> Drawing
+drawBall {ball, ballSize} = whiteRectangle ball.x ball.y ballSize ballSize
+
 drawPaddles :: Pong -> Drawing
-drawPaddles {paddles, paddleWidth, paddleHeight} =
-  foldMap drawPaddle paddles
+drawPaddles {paddles, paddleWidth, paddleHeight} = foldMap drawPaddle paddles
   where
-    drawPaddle p = filled (fillColor white) (rectangle p.x p.y paddleWidth paddleHeight)
+    drawPaddle p = whiteRectangle p.x p.y paddleWidth paddleHeight
 
 drawPongState :: Pong -> Drawing
-drawPongState pong = background <> drawPaddles pong
+drawPongState pong = background
+                  <> drawPaddles pong
+                  <> drawBall pong
 
 drawGameState :: Game -> Drawing
 drawGameState (Progress ({ball, paddles, scores, walls}))  = background
