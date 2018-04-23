@@ -1,4 +1,4 @@
-module Pong(init, move) where
+module Pong(init, move, GameInput, PlayerInput) where
 import Prelude ((&&), (>), (<), (+), (/), (*), (-), negate, pure, bind, Unit, discard, unit, ($), (>>=), otherwise)
 import Data.Identity
 import Data.Ord (clamp)
@@ -11,17 +11,17 @@ type Vector = {
   y :: Number
 }
 
-type Input = {
+type PlayerInput = {
   up :: Boolean,
   down :: Boolean
 }
 
 type GameInput = {
-  player1 :: Input,
-  player2 :: Input
+  player1 :: PlayerInput,
+  player2 :: PlayerInput
 }
 
-paddleVelocity :: Input -> Number -> Number
+paddleVelocity :: PlayerInput -> Number -> Number
 paddleVelocity {up, down} paddleSpeed
   | up = -paddleSpeed
   | down = paddleSpeed
