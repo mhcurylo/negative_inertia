@@ -41,8 +41,8 @@ paddleVelocity {up, down} paddleSpeed
   | down = paddleSpeed
   | otherwise = 0.0
 
-clampBall :: Pong -> Pong
-clampBall game@{ball, ballSize, canvasHeight} =
+clampBallY :: Pong -> Pong
+clampBallY game@{ball, ballSize, canvasHeight} =
   game {
     ball {
       y = clamp 0.0 (canvasHeight - ballSize) ball.y
@@ -144,7 +144,7 @@ initPong canvasWidth canvasHeight = {
 
 movePong :: PongInput -> Pong -> Pong
 movePong input game =
-                  clampBall
+                  clampBallY
                 $ ballVsWalls
                 $ paddle1VsBall
                 $ paddle2VsBall
