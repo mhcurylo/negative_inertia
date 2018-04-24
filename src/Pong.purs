@@ -117,14 +117,14 @@ movePaddles velocities game = game {
 vec :: Number -> Number -> Vector
 vec x y = {x, y}
 
-centerBall :: Pong -> Pong
-centerBall game@{canvasWidth, canvasHeight, ballSize} =
+resetBall :: Pong -> Pong
+resetBall game@{canvasWidth, canvasHeight, ballSize} =
   game {
     ball = vec (canvasWidth * 0.5 - ballSize * 0.5) (canvasHeight * 0.5 - ballSize * 0.5)
   }
 
 initPong :: Number -> Number -> Pong
-initPong canvasWidth canvasHeight = centerBall o
+initPong canvasWidth canvasHeight = resetBall o
   where
     s = canvasHeight / 150.0
     paddleWidth = 6.0 * s
