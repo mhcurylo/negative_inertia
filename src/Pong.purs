@@ -3,6 +3,7 @@ import Prelude ((&&), (>), (<), (+), (/), (*), (-), negate, pure, bind, Unit, di
 import Data.Identity
 import Data.Ord (clamp)
 import Data.Tuple
+import Data.Maybe
 import Data.Array
 import Partial.Unsafe (unsafePartial)
 
@@ -44,6 +45,15 @@ paddleVelocity {up, down} paddleSpeed
   | down = paddleSpeed
   | otherwise = 0.0
 
+unsafeModifyAt :: forall a. Int -> (a -> a) -> Array a -> Array a
+unsafeModifyAt i f v = unsafePartial $ fromJust $ modifyAt i f v
+
+clampBallX :: Pong -> Pong
+clampBallX game@{ball, ballSize, canvasWidth}
+  | ball.x + ballSize < 0.0 = resetBall game { scores = unsafeModifyAt 0 (\x->x+1) game.scores }
+  | ball.x > canvasWidth = resetBall game { scores = unsafeModifyAt 1 (\x->x+1) game.scores }
+  | otherwise = game
+
 clampBallY :: Pong -> Pong
 clampBallY game@{ball, ballSize, canvasHeight} =
   game {
@@ -54,7 +64,7 @@ clampBallY game@{ball, ballSize, canvasHeight} =
 
 ballVsWalls :: Pong -> Pong
 ballVsWalls game@{ball, ballSize, ballVelocity, canvasHeight}
-  | ball.y < 0.0 = game { ballVelocity { y = -ballVelocity.y }}
+  | ball.y < 0.0 = game { ballVelocity {y = -ballVelocity.y }}
   | ball.y + ballSize > canvasHeight = game { ballVelocity { y = -ballVelocity.y }}
   | otherwise = game
 
@@ -118,9 +128,10 @@ vec :: Number -> Number -> Vector
 vec x y = {x, y}
 
 resetBall :: Pong -> Pong
-resetBall game@{canvasWidth, canvasHeight, ballSize} =
+resetBall game@{canvasWidth, canvasHeight, ballSize, ballSpeed} =
   game {
-    ball = vec (canvasWidth * 0.5 - ballSize * 0.5) (canvasHeight * 0.5 - ballSize * 0.5)
+    ball = vec (canvasWidth * 0.5 - ballSize * 0.5) (canvasHeight * 0.5 - ballSize * 0.5),
+    ballVelocity = vec ballSpeed ballSpeed
   }
 
 initPong :: Number -> Number -> Pong
@@ -149,12 +160,13 @@ initPong canvasWidth canvasHeight = resetBall o
         0
       ],
       ball: origin,
-      ballVelocity: vec ballSpeed ballSpeed
+      ballVelocity: origin
     }
 
 movePong :: PongInput -> Pong -> Pong
 movePong input game =
-                  clampBallY
+                  clampBallX
+                $ clampBallY
                 $ ballVsWalls
                 $ paddle1VsBall
                 $ paddle2VsBall
