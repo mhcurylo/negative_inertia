@@ -11,6 +11,9 @@ type Vector = {
   y :: Number
 }
 
+origin :: Vector
+origin = vec 0.0 0.0
+
 type PlayerInput = {
   up :: Boolean,
   down :: Boolean
@@ -114,26 +117,14 @@ movePaddles velocities game = game {
 vec :: Number -> Number -> Vector
 vec x y = {x, y}
 
-initPong :: Number -> Number -> Pong
-initPong canvasWidth canvasHeight = {
-    canvasWidth: canvasWidth,
-    canvasHeight: canvasHeight,
-    ballSize: ballSize,
-    ballSpeed: ballSpeed,
-    paddleWidth: 6.0 * s,
-    paddleHeight: 40.0 * s,
-    paddleSpeed: 3.0 * s,
-    paddles: [
-      vec 0.0 paddleY,
-      vec (canvasWidth - paddleWidth) paddleY
-    ],
-    scores: [
-      0,
-      0
-    ],
-    ball: vec (canvasWidth * 0.5 - ballSize * 0.5) (canvasHeight * 0.5 - ballSize * 0.5),
-    ballVelocity: vec ballSpeed ballSpeed
+centerBall :: Pong -> Pong
+centerBall game@{canvasWidth, canvasHeight, ballSize} =
+  game {
+    ball = vec (canvasWidth * 0.5 - ballSize * 0.5) (canvasHeight * 0.5 - ballSize * 0.5)
   }
+
+initPong :: Number -> Number -> Pong
+initPong canvasWidth canvasHeight = centerBall o
   where
     s = canvasHeight / 150.0
     paddleWidth = 6.0 * s
@@ -141,6 +132,25 @@ initPong canvasWidth canvasHeight = {
     ballSize = 6.0 * s
     ballSpeed = 2.0 * s
     paddleY = (canvasHeight * 0.5 - paddleHeight * 0.5)
+    o = {
+      canvasWidth: canvasWidth,
+      canvasHeight: canvasHeight,
+      ballSize: ballSize,
+      ballSpeed: ballSpeed,
+      paddleWidth: 6.0 * s,
+      paddleHeight: 40.0 * s,
+      paddleSpeed: 3.0 * s,
+      paddles: [
+        vec 0.0 paddleY,
+        vec (canvasWidth - paddleWidth) paddleY
+      ],
+      scores: [
+        0,
+        0
+      ],
+      ball: origin,
+      ballVelocity: vec ballSpeed ballSpeed
+    }
 
 movePong :: PongInput -> Pong -> Pong
 movePong input game =
