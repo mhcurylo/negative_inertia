@@ -33,7 +33,8 @@ type Pong = {
   paddleWidth :: Number,
   paddleHeight :: Number,
   paddleSpeed :: Number,
-  paddles :: Array Vector,
+  paddle1 :: Vector,
+  paddle2 :: Vector,
   scores :: Array Int,
   ball :: Vector,
   ballVelocity :: Vector
@@ -80,7 +81,7 @@ moveBall game = game {
   }
 
 paddle1VsBall :: Pong -> Pong
-paddle1VsBall game@{ball, ballSize, ballVelocity, paddles, paddleHeight, paddleWidth} = r
+paddle1VsBall game@{ball, ballSize, ballVelocity, paddle1, paddleHeight, paddleWidth} = r
   where
     r = if intersects
         then game {
@@ -92,14 +93,13 @@ paddle1VsBall game@{ball, ballSize, ballVelocity, paddles, paddleHeight, paddleW
             }
           }
         else game
-    paddle1 = unsafePartial $ unsafeIndex paddles 0
     intersects =
       ball.x < paddle1.x + paddleWidth
         && ball.y + ballSize > paddle1.y
         && ball.y < paddle1.y + paddleHeight
 
 paddle2VsBall :: Pong -> Pong
-paddle2VsBall game@{ball, ballSize, ballVelocity, paddles, paddleHeight} = r
+paddle2VsBall game@{ball, ballSize, ballVelocity, paddle2, paddleHeight} = r
   where
     r = if intersects
         then game {
@@ -111,15 +111,15 @@ paddle2VsBall game@{ball, ballSize, ballVelocity, paddles, paddleHeight} = r
             }
           }
         else game
-    paddle2 = unsafePartial $ unsafeIndex paddles 1
     intersects =
         ball.x > paddle2.x - ballSize
       && ball.y + ballSize > paddle2.y
       && ball.y < paddle2.y + paddleHeight
 
-movePaddles :: Array Number -> Pong -> Pong
-movePaddles velocities game = game {
-    paddles = zipWith movePaddle game.paddles velocities
+movePaddles :: Number -> Number -> Pong -> Pong
+movePaddles vel1 vel2 game = game {
+    paddle1 = movePaddle game.paddle1 vel1,
+    paddle2 = movePaddle game.paddle2 vel2
   }
   where
     movePaddle :: Vector -> Number -> Vector
@@ -154,10 +154,8 @@ initPong canvasWidth canvasHeight = resetBall o
       paddleWidth: 6.0 * s,
       paddleHeight: 40.0 * s,
       paddleSpeed: 3.0 * s,
-      paddles: [
-        vec 0.0 paddleY,
-        vec (canvasWidth - paddleWidth) paddleY
-      ],
+      paddle1: vec 0.0 paddleY,
+      paddle2: vec (canvasWidth - paddleWidth) paddleY,
       scores: [
         0,
         0
@@ -173,7 +171,7 @@ movePong input game =
                 $ ballVsWalls
                 $ paddle1VsBall
                 $ paddle2VsBall
-                $ movePaddles [paddle1Velocity, paddle2Velocity]
+                $ movePaddles paddle1Velocity paddle2Velocity
                 $ moveBall game
   where
     paddle1Velocity = paddleVelocity input.player1 game.paddleSpeed

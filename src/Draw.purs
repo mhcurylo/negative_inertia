@@ -43,7 +43,8 @@ drawBall :: Pong -> Drawing
 drawBall {ball, ballSize} = whiteRectangle ball.x ball.y ballSize ballSize
 
 drawPaddles :: Pong -> Drawing
-drawPaddles {paddles, paddleWidth, paddleHeight} = foldMap drawPaddle paddles
+drawPaddles {paddle1, paddle2, paddleWidth, paddleHeight} =
+    drawPaddle paddle1 <> drawPaddle paddle2
   where
     drawPaddle p = whiteRectangle p.x p.y paddleWidth paddleHeight
 
