@@ -1,10 +1,11 @@
 module Draw (drawGameState, drawPongState) where
 
-import Prelude (map, join, show, ($), (<>), (>))
+import Prelude (map, join, show, ($), (<>), (>), (<$>))
 import Graphics.Drawing.Font (font, sansSerif, bold, Font)
 import Graphics.Drawing (Drawing, black, fillColor, filled, rectangle, text, white)
 import Data.Tuple (Tuple(Tuple))
 import Data.Foldable (foldMap, foldr)
+import Data.String (joinWith)
 import Algorithm (listTuple)
 import Vector (getX, getY)
 import Pong (Pong)
@@ -46,10 +47,14 @@ drawPaddles {paddles, paddleWidth, paddleHeight} = foldMap drawPaddle paddles
   where
     drawPaddle p = whiteRectangle p.x p.y paddleWidth paddleHeight
 
+drawPongScores :: Pong -> Drawing
+drawPongScores pong = text scoreFont 2.0 18.0 (fillColor white) (joinWith " : " (show <$> pong.scores))
+
 drawPongState :: Pong -> Drawing
 drawPongState pong = background
                   <> drawPaddles pong
                   <> drawBall pong
+                  <> drawPongScores pong
 
 drawGameState :: Game -> Drawing
 drawGameState (Progress ({ball, paddles, scores, walls}))  = background
