@@ -48,10 +48,13 @@ paddleVelocity {up, down} paddleSpeed
 unsafeModifyAt :: forall a. Int -> (a -> a) -> Array a -> Array a
 unsafeModifyAt i f v = unsafePartial $ fromJust $ modifyAt i f v
 
+inc :: Int -> Int
+inc x = x + 1
+
 clampBallX :: Pong -> Pong
 clampBallX game@{ball, ballSize, canvasWidth}
-  | ball.x + ballSize < 0.0 = resetBall game { scores = unsafeModifyAt 0 (\x->x+1) game.scores }
-  | ball.x > canvasWidth = resetBall game { scores = unsafeModifyAt 1 (\x->x+1) game.scores }
+  | ball.x + ballSize < 0.0 = resetBall game { scores = unsafeModifyAt 0 inc game.scores }
+  | ball.x > canvasWidth = resetBall game { scores = unsafeModifyAt 1 inc game.scores }
   | otherwise = game
 
 clampBallY :: Pong -> Pong
