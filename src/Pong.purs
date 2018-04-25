@@ -5,7 +5,6 @@ import Data.Ord (clamp)
 import Data.Tuple
 import Data.Maybe
 import Data.Array
-import Partial.Unsafe (unsafePartial)
 
 type Vector = {
   x :: Number,
@@ -46,12 +45,6 @@ paddleVelocity {up, down} paddleSpeed
   | up = -paddleSpeed
   | down = paddleSpeed
   | otherwise = 0.0
-
-unsafeModifyAt :: forall a. Int -> (a -> a) -> Array a -> Array a
-unsafeModifyAt i f v = unsafePartial $ fromJust $ modifyAt i f v
-
-inc :: Int -> Int
-inc x = x + 1
 
 clampBallX :: Pong -> Pong
 clampBallX game@{ball, ballSize, canvasWidth}
