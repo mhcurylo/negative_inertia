@@ -1,12 +1,14 @@
-module Draw (drawGameState) where
+module Draw (drawGameState, drawPongState) where
 
-import Prelude (join, show, ($), (<>), (>))
+import Prelude (map, join, show, ($), (<>), (>), (<$>))
 import Graphics.Drawing.Font (font, sansSerif, bold, Font)
 import Graphics.Drawing (Drawing, black, fillColor, filled, rectangle, text, white)
 import Data.Tuple (Tuple(Tuple))
-import Data.Foldable (foldMap)
+import Data.Foldable (foldMap, foldr)
+import Data.String (joinWith)
 import Algorithm (listTuple)
 import Vector (getX, getY)
+import Pong (Pong)
 
 import Types 
 
@@ -33,6 +35,28 @@ finalScores = text scoreFont 100.0 200.0 (fillColor white)
 
 pressToPlay :: Drawing 
 pressToPlay = text scoreFont 100.0 300.0 (fillColor white) "Press to play!"
+
+whiteRectangle :: Number -> Number -> Number -> Number -> Drawing
+whiteRectangle x y w h = filled (fillColor white) (rectangle x y w h)
+
+drawBall :: Pong -> Drawing
+drawBall {ball, ballSize} = whiteRectangle ball.x ball.y ballSize ballSize
+
+drawPaddles :: Pong -> Drawing
+drawPaddles {paddle1, paddle2, paddleWidth, paddleHeight} =
+    drawPaddle paddle1 <> drawPaddle paddle2
+  where
+    drawPaddle p = whiteRectangle p.x p.y paddleWidth paddleHeight
+
+drawPongScores :: Pong -> Drawing
+drawPongScores {score1, score2} =
+  text scoreFont 2.0 18.0 (fillColor white) (show score1 <> " : " <> show score2)
+
+drawPongState :: Pong -> Drawing
+drawPongState pong = background
+                  <> drawPaddles pong
+                  <> drawBall pong
+                  <> drawPongScores pong
 
 drawGameState :: Game -> Drawing
 drawGameState (Progress ({ball, paddles, scores, walls}))  = background

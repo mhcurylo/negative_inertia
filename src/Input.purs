@@ -1,4 +1,4 @@
-module Input (input) where
+module Input (input, inputPong) where
 
 import Prelude (($), (<$>), (<<<), flip)
 import Data.Tuple (Tuple(Tuple))
@@ -11,6 +11,7 @@ import FRP.Behavior.Keyboard (keys)
 import FRP.Behavior (ABehavior)
 import FRP.Event (Event)
 import Types (Move(Down, Up, Stay), PlayerMoves)
+import Pong (PongInput)
  
 type KeyMap = Map Int Move
 type KeyMaps = Tuple KeyMap KeyMap 
@@ -28,6 +29,21 @@ keysToMove :: Set Int -> PlayerMoves
 keysToMove pressedKeys = bimap toMove toMove keyMaps 
   where
   toMove = mapToMove pressedKeys
+
+keysToGameInput :: Set Int -> PongInput
+keysToGameInput pressedKeys = {
+    player1: {
+      up: member 65 pressedKeys,
+      down: member 90 pressedKeys
+    },
+    player2: {
+      up: member 38 pressedKeys,
+      down: member 40 pressedKeys
+    }
+  }
+
+inputPong :: ABehavior Event PongInput
+inputPong = keysToGameInput <$> keys
 
 input :: ABehavior Event PlayerMoves
 input = keysToMove <$> keys  
