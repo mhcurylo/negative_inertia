@@ -35,7 +35,8 @@ type Pong = {
   paddleSpeed :: Number,
   paddle1 :: Vector,
   paddle2 :: Vector,
-  scores :: Array Int,
+  score1 :: Int,
+  score2 :: Int,
   ball :: Vector,
   ballVelocity :: Vector
 }
@@ -54,8 +55,8 @@ inc x = x + 1
 
 clampBallX :: Pong -> Pong
 clampBallX game@{ball, ballSize, canvasWidth}
-  | ball.x + ballSize < 0.0 = resetBall game { scores = unsafeModifyAt 0 inc game.scores }
-  | ball.x > canvasWidth = resetBall game { scores = unsafeModifyAt 1 inc game.scores }
+  | ball.x + ballSize < 0.0 = resetBall game { score1 = game.score1 + 1}
+  | ball.x > canvasWidth = resetBall game { score2 = game.score2 + 1 }
   | otherwise = game
 
 clampBallY :: Pong -> Pong
@@ -156,10 +157,8 @@ initPong canvasWidth canvasHeight = resetBall o
       paddleSpeed: 3.0 * s,
       paddle1: vec 0.0 paddleY,
       paddle2: vec (canvasWidth - paddleWidth) paddleY,
-      scores: [
-        0,
-        0
-      ],
+      score1: 0,
+      score2: 0,
       ball: origin,
       ballVelocity: origin
     }

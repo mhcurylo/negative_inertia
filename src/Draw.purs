@@ -49,7 +49,8 @@ drawPaddles {paddle1, paddle2, paddleWidth, paddleHeight} =
     drawPaddle p = whiteRectangle p.x p.y paddleWidth paddleHeight
 
 drawPongScores :: Pong -> Drawing
-drawPongScores pong = text scoreFont 2.0 18.0 (fillColor white) (joinWith " : " (show <$> pong.scores))
+drawPongScores {score1, score2} =
+  text scoreFont 2.0 18.0 (fillColor white) (show score1 <> " : " <> show score2)
 
 drawPongState :: Pong -> Drawing
 drawPongState pong = background
