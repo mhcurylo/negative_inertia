@@ -17,6 +17,7 @@
     "purescript-debug": "^3.0.0",
     "purescript-generics": "^4.0.0",
     "purescript-quickcheck": "^4.6.2",
-    "purescript-test-unit": "^13.0.0"
+    "purescript-test-unit": "^13.0.0",
+    "purescript-unfoldable": "^3.1.0"
   }
 }

@@ -45,6 +45,7 @@ type GameState = {
 data Game = Start
   | Progress GameState
   | Finish Int Int 
+  | Suspend Int Game
 
 createPhysical :: PhysicalKind -> Number -> Number -> Number -> Number -> Number -> Number -> Physical
 createPhysical kind ix iy w h x y = ({
@@ -60,7 +61,7 @@ createBox :: Number -> Number -> Number -> Number -> Wall
 createBox = createPhysical Wall 0.0 0.0
 
 createPaddle :: Number -> Number -> Paddle
-createPaddle = createPhysical Paddle 0.0 0.95 20.0 70.0
+createPaddle = createPhysical Paddle 0.0 0.90 20.0 70.0
 
 createBall :: Number -> Number -> Ball
 createBall = createPhysical Ball 1.001 1.001 15.0 15.0

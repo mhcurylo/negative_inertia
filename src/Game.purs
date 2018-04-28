@@ -1,14 +1,14 @@
 module Game (gameLoop, initialGameState) where
 
-import Prelude (join, negate, (*), (+), (<), (<<<), (>), (<$>), (||), ($))
-import Types (Ball, Game(..), GameState, Move(..), Paddle, Physical, PhysicalKind(..), PlayerMoves, both, createBall, createPaddle, createWall)
-import Vector (Vector, getX, scale, vec, origin)
+import AABB (Collision)
+import Control.Biapply ((<<*>>))
+import Data.Array (filter, head)
 import Data.Maybe (Maybe, isJust)
 import Data.Tuple (Tuple(Tuple), fst, snd)
-import Data.Array (filter, head)
-import Control.Biapply ((<<*>>))
 import Physics (simulate, defaultCollide, composeCollisions, CollisionHandler)
-import AABB (Collision)
+import Prelude (join, negate, ($), (*), (+), (-), (<), (<$>), (<<<), (>), (||))
+import Types (Ball, Game(..), GameState, Move(..), Paddle, Physical, PhysicalKind(..), PlayerMoves, both, createBall, createPaddle, createWall)
+import Vector (Vector, getX, scale, vec, origin)
 
 
 accBall :: Ball -> Ball
@@ -24,9 +24,9 @@ initialGameState = ({
 
 
 accUp :: Vector
-accUp = vec 0.0 (-1.2)
+accUp = vec 0.0 (-1.5)
 accDown :: Vector
-accDown = vec 0.0 1.2
+accDown = vec 0.0 1.5
 accStay :: Vector
 accStay = origin  
 
@@ -79,7 +79,7 @@ score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0
 
 finish :: GameState -> Game
 finish gs@({scores: (Tuple p1 p2)}) = if (p1 > 9) || (p2 > 9)
-  then Finish p1 p2
+  then Suspend 600 $ Finish p1 p2
   else Progress gs
 
 resetIfMoved :: PlayerMoves -> Game -> Game
@@ -88,4 +88,6 @@ resetIfMoved _ g = Progress initialGameState
 
 gameLoop :: PlayerMoves -> Game -> Game
 gameLoop pm (Progress gameState) = finish <<< score <<< move <<< playerMoves pm $ gameState
+gameLoop pm  (Suspend 0 g) = gameLoop pm g
+gameLoop _  (Suspend i g) = Suspend (i - 1) (gameLoop (Tuple Stay Stay) g)
 gameLoop pm g = resetIfMoved pm g 

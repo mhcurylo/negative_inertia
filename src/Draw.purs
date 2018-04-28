@@ -32,7 +32,7 @@ finalScores :: String -> Drawing
 finalScores = text scoreFont 100.0 200.0 (fillColor white)
 
 pressToPlay :: Drawing 
-pressToPlay = text scoreFont 100.0 300.0 (fillColor white) "Press to play!"
+pressToPlay = text scoreFont 100.0 300.0 (fillColor white) "Press A/Z || UP/DOWN to play!"
 
 drawGameState :: Game -> Drawing
 drawGameState (Progress ({ball, paddles, scores, walls}))  = background
@@ -43,3 +43,5 @@ drawGameState (Start) = background <> pressToPlay <> mainText "NEGATIVE INERTIA"
 drawGameState (Finish p1 p2) = background <> pressToPlay <> mainText (winner <> " WON") <> finalScores (showScores p1 p2)
   where
   winner = if p1 > p2 then "P1" else "P2"
+
+drawGameState (Suspend _ g) = drawGameState g
