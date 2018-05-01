@@ -24,7 +24,7 @@ game = do
   mc <- getCanvasElementById "canvas"
   let canvas = unsafePartial (fromJust mc)
   ctx <- getContext2D canvas
-  _ <- animateGame input gameLoop (Suspend 600 Start) (render ctx <<< drawGameState)
+  _ <- animateGame input gameLoop (Suspend 60 Start) (render ctx <<< drawGameState)
   pure unit
 
 main :: Unit

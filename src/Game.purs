@@ -10,18 +10,25 @@ import Prelude (join, negate, ($), (*), (+), (-), (<), (<$>), (<<<), (>), (||))
 import Types (Ball, Game(..), GameState, Move(..), Paddle, Physical, PhysicalKind(..), PlayerMoves, both, createBall, createPaddle, createWall)
 import Vector (Vector, getX, scale, vec, origin)
 
-
-accBall :: Ball -> Ball
-accBall b = b {vel = vec 4.0 0.0}
+startingBall :: Boolean -> Ball
+startingBall dirR = (createBall 495.0 300.0) {vel = (vec 4.0 0.0) * accMod}
+  where
+  accMod = if dirR then vec (1.0) (1.0) 
+             else vec (-1.0) (-1.0)
 
 initialGameState :: GameState
 initialGameState = ({
-    ball: accBall (createBall 495.0 300.0)
+    ball: startingBall true
   , paddles: Tuple (createPaddle 30.0 280.0) (createPaddle 960.0 280.0)
   , scores: Tuple 0 0
   , walls: Tuple (createWall 35.0) (createWall 590.0)
 })
 
+initGameState :: Boolean -> Int -> Int -> GameState
+initGameState dirR p1s p2s = initialGameState {
+      scores = Tuple p1s p2s
+    , ball = startingBall dirR
+  }
 
 accUp :: Vector
 accUp = vec 0.0 (-1.5)
@@ -69,17 +76,17 @@ move gs = case ret of
     ret = applyInertia <$> simulate collide 1.0 [fst gs.paddles, snd gs.paddles, fst gs.walls, snd gs.walls, gs.ball]
 
 score :: GameState -> GameState
-score gs@{ball, scores: (Tuple p1 p2)} = if bx < 0.0
-  then initialGameState {scores = Tuple p1 (p2 + 1)}
-  else if bx > 1000.0
-    then initialGameState {scores = Tuple (p1 + 1) p2}
+score gs@{ball, scores: (Tuple p1 p2)} = if bx < (-50.0)
+  then initGameState false p1 (p2 + 1)
+  else if bx > 1050.0
+    then initGameState true (p1 + 1) p2
     else gs 
   where
   bx = getX ball.pos      
 
 finish :: GameState -> Game
 finish gs@({scores: (Tuple p1 p2)}) = if (p1 > 9) || (p2 > 9)
-  then Suspend 600 $ Finish p1 p2
+  then Suspend 60 $ Finish p1 p2
   else Progress gs
 
 resetIfMoved :: PlayerMoves -> Game -> Game

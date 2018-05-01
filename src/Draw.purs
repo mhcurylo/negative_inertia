@@ -44,4 +44,8 @@ drawGameState (Finish p1 p2) = background <> pressToPlay <> mainText (winner <> 
   where
   winner = if p1 > p2 then "P1" else "P2"
 
+drawGameState (Suspend _ Start) = background <> mainText "NEGATIVE INERTIA"
+drawGameState (Suspend _ (Finish p1 p2)) = background <> mainText (winner <> " WON") <> finalScores (showScores p1 p2)
+  where
+  winner = if p1 > p2 then "P1" else "P2"
 drawGameState (Suspend _ g) = drawGameState g
