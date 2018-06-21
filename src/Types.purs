@@ -2,6 +2,7 @@ module Types where
 
 import Prelude 
 import Data.Tuple (Tuple)
+import Data.Number (infinity)
 import Data.Bifunctor (bimap) 
 import Vector (Vector, vec, origin)
 
@@ -16,6 +17,7 @@ type Physical = {
   , size :: Vector
   , inertia :: Vector
   , kind :: PhysicalKind
+  , mass :: Number
 }
 
 showPhysical :: Physical -> String
@@ -55,6 +57,7 @@ createPhysical kind ix iy w h x y = ({
   , size: vec w h
   , inertia: vec ix iy
   , kind: kind
+  , mass: infinity
 }) 
 
 createBox :: Number -> Number -> Number -> Number -> Wall

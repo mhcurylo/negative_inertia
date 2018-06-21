@@ -4,7 +4,7 @@ module Physics (
   CollisionHandler,
   composeCollisions
 ) where
-import Prelude ((<$>), ($), (<), (>=), (-), (+), negate, (*))
+import Prelude ((<$>), ($), (<), (>=), (-), (+), negate, (*), (/))
 import Math (max)
 import AABB (Collision, sweepPhysicals)
 import Algorithm (foldPairs)
@@ -50,6 +50,21 @@ applyLinearCollisionImpulse {normal} x@{vel} =
     j = max (-(1.0 + restitution) * d) 0.0
   in
     x { vel = vel + scale j normal }
+
+-- | Calculate impulse response of first physical to second
+-- | XXX: function name is not accurate
+-- |
+-- | Scalar formula
+-- | console.warn( ((m2 * (v2 ** 2)) / m1) ** 0.5)
+-- |
+applyIR :: Physical -> Physical -> Physical
+applyIR p1 p2 = p1 { vel = r }
+  where
+    v1 = p1.vel
+    m1 = p1.mass
+    v2 = p2.vel
+    m2 = p2.mass
+    r = scale (1.0 / m1) (scale m2 v2)
 
 defaultCollide :: CollisionHandler
 defaultCollide collision@{normal} a b = Tuple a' b'
